@@ -43,7 +43,7 @@ const StoragePanel = () => {
                 <div className="bg-slate-900 p-3 rounded-md text-xs font-mono">
                   SELECT input, timestamp, context_flags<br/>
                   FROM interactions<br/>
-                  WHERE timestamp > CURRENT_DATE - INTERVAL 1 DAY<br/>
+                  WHERE timestamp {'>'}= CURRENT_DATE - INTERVAL 1 DAY<br/>
                   ORDER BY timestamp DESC<br/>
                   LIMIT 10
                 </div>
@@ -72,11 +72,11 @@ const StoragePanel = () => {
                 </div>
                 
                 <div className="bg-slate-900 p-3 rounded-md text-xs font-mono">
-                  const results = await chromaDB.query({<br/>
+                  const results = await chromaDB.query(&#123;<br/>
                   &nbsp;&nbsp;collection: "knowledge_base",<br/>
                   &nbsp;&nbsp;query_embeddings: embeddings,<br/>
                   &nbsp;&nbsp;n_results: 5<br/>
-                  });
+                  &#125;);
                 </div>
               </div>
             </TabsContent>
