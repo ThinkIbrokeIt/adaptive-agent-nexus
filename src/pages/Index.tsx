@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import WorkflowVisualizer from "@/components/WorkflowVisualizer";
 import StoragePanel from "@/components/StoragePanel";
