@@ -1,73 +1,80 @@
-# Welcome to your Lovable project
 
-## Project info
+# Agent Console Commands
 
-**URL**: https://lovable.dev/projects/8602dc34-e345-42dc-bb03-f515e97739cd
+The Agent Console provides a powerful interface for interacting with the AI system. Here's a comprehensive guide to the available commands:
 
-## How can I edit this code?
+## Basic Commands
 
-There are several ways of editing your application.
+### `help`
+- **Description**: Displays a list of available commands
+- **Usage**: Simply type `help`
+- **Example**:
+  ```
+  > help
+  Available commands: run workflow, query [db] [params], status, clear
+  ```
 
-**Use Lovable**
+### `status`
+- **Description**: Provides an overview of the system's current state
+- **Usage**: Type `status`
+- **Example**:
+  ```
+  > status
+  System status: OPERATIONAL
+  McP processors: ACTIVE (3/3)
+  Memory usage: 1.2GB / 4GB
+  Storage status: CONNECTED
+  ```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8602dc34-e345-42dc-bb03-f515e97739cd) and start prompting.
+### `clear`
+- **Description**: Clears the console log
+- **Usage**: Type `clear`
+- **Example**:
+  ```
+  > clear
+  Console cleared.
+  ```
 
-Changes made via Lovable will be committed automatically to this repo.
+## Workflow Commands
 
-**Use your preferred IDE**
+### `run workflow`
+- **Description**: Initiates the McP (Monitor-Contextualize-Personalize) workflow
+- **Usage**: Type `run workflow`
+- **Stages**:
+  1. Monitor: Captures user interaction
+  2. Contextualize: Retrieves relevant knowledge vectors
+  3. Personalize: Generates adaptive response
+- **Example**:
+  ```
+  > run workflow
+  Initiating McP workflow...
+  Monitor phase completed. User interaction stored in DuckDB.
+  Contextualize phase completed. Knowledge vectors retrieved.
+  Personalize phase completed. Response generated.
+  ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Database Interaction
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### `query`
+- **Description**: Executes database queries
+- **Usage**: `query [db] [parameters]`
+- **Example**:
+  ```
+  > query interactions limit 5
+  Query returned 5 results.
+  ```
 
-Follow these steps:
+## Troubleshooting
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- If a command is not recognized, the console will return an error message
+- Commands are case-insensitive
+- Refer to the `help` command for the most up-to-date list of available commands
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Versions
 
-# Step 3: Install the necessary dependencies.
-npm i
+Current Console Version: v0.4.2-alpha
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/8602dc34-e345-42dc-bb03-f515e97739cd) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## Quick Tips
+- Press Enter to execute a command
+- Use the command history for quick access to previous commands
+- The console provides real-time feedback for each command execution
