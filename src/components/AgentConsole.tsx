@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
+import { CircleArrowUp } from "lucide-react";
 
 const AgentConsole = () => {
   const [input, setInput] = useState("");
@@ -23,9 +24,15 @@ const AgentConsole = () => {
       timestamp: new Date("2025-04-23T14:32:15Z").toISOString(),
       type: "info",
       message: "Local LLM initialized using llama3:instruct model.",
+    },
+    {
+      timestamp: new Date("2025-04-23T14:32:20Z").toISOString(),
+      type: "system",
+      message: "Feedback loop enabled. Agent will continuously learn from interactions.",
     }
   ]);
   const { toast } = useToast();
+  const [feedbackEnabled, setFeedbackEnabled] = useState(true);
 
   const addLog = (type, message) => {
     setLogs(prev => [
@@ -58,6 +65,15 @@ const AgentConsole = () => {
         }, 3000);
         setTimeout(() => {
           addLog("success", "Personalize phase completed. Response generated.");
+          
+          if (feedbackEnabled) {
+            setTimeout(() => {
+              addLog("info", "Feedback loop activated. Processing response effectiveness...");
+            }, 1000);
+            setTimeout(() => {
+              addLog("success", "Adaptation complete. Agent knowledge graph updated.");
+            }, 3000);
+          }
         }, 5000);
       } else {
         addLog("error", `Unknown workflow: ${parts[1]}`);
@@ -68,18 +84,34 @@ const AgentConsole = () => {
         addLog("info", "Query returned 5 results.");
       }, 1500);
     } else if (input.toLowerCase() === "help") {
-      addLog("info", "Available commands: run workflow, query [db] [params], status, clear");
+      addLog("info", "Available commands: run workflow, query [db] [params], status, clear, feedback [on|off]");
     } else if (input.toLowerCase() === "status") {
       addLog("info", "System status: OPERATIONAL");
       addLog("info", "McP processors: ACTIVE (3/3)");
       addLog("info", "Memory usage: 1.2GB / 4GB");
       addLog("info", "Storage status: CONNECTED");
+      addLog("info", `Feedback loop: ${feedbackEnabled ? "ENABLED" : "DISABLED"}`);
     } else if (input.toLowerCase() === "clear") {
       setLogs([{
         timestamp: new Date().toISOString(),
         type: "system",
         message: "Console cleared."
       }]);
+    } else if (input.toLowerCase().startsWith("feedback")) {
+      const parts = input.toLowerCase().split(" ");
+      if (parts.length > 1) {
+        if (parts[1] === "on") {
+          setFeedbackEnabled(true);
+          addLog("success", "Feedback loop enabled. Agent will continuously learn from interactions.");
+        } else if (parts[1] === "off") {
+          setFeedbackEnabled(false);
+          addLog("info", "Feedback loop disabled. Agent will not adapt from interactions.");
+        } else {
+          addLog("error", "Invalid feedback command. Use 'feedback on' or 'feedback off'");
+        }
+      } else {
+        addLog("info", `Current feedback status: ${feedbackEnabled ? "ENABLED" : "DISABLED"}`);
+      }
     } else {
       addLog("error", `Unknown command: ${input}`);
     }
@@ -96,7 +128,15 @@ const AgentConsole = () => {
       <Card className="bg-slate-800/50 border-slate-700">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Agent Console</span>
+            <div className="flex items-center">
+              <span>Agent Console</span>
+              {feedbackEnabled && (
+                <Badge variant="outline" className="ml-2 bg-green-900/30 text-green-400 border-green-600">
+                  <CircleArrowUp className="h-3 w-3 mr-1 animate-pulse" />
+                  Learning
+                </Badge>
+              )}
+            </div>
             <Badge variant="outline" className="font-mono">v0.4.2-alpha</Badge>
           </CardTitle>
         </CardHeader>

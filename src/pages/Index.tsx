@@ -21,8 +21,10 @@ const Index = () => {
   const [triggerCount, setTriggerCount] = useState({
     monitor: 152,
     contextualize: 147,
-    personalize: 134
+    personalize: 134,
+    feedback: 129
   });
+  const [feedbackEnabled, setFeedbackEnabled] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,7 +57,17 @@ const Index = () => {
         setTimeout(() => {
           setTriggerCount(prev => ({ ...prev, personalize: prev.personalize + 1 }));
           toast({ title: "Personalize Phase Complete", description: "Adaptive response generated successfully" });
-          setProcessingStage(null);
+          
+          if (feedbackEnabled) {
+            setProcessingStage("feedback");
+            setTimeout(() => {
+              setTriggerCount(prev => ({ ...prev, feedback: prev.feedback + 1 }));
+              toast({ title: "Feedback Loop Complete", description: "Agent knowledge updated based on response effectiveness" });
+              setProcessingStage(null);
+            }, 2000);
+          } else {
+            setProcessingStage(null);
+          }
         }, 2000);
       }, 3000);
     }, 2000);
@@ -83,6 +95,7 @@ const Index = () => {
             <McpTriggerCards 
               triggerCount={triggerCount}
               processingStage={processingStage}
+              feedbackEnabled={feedbackEnabled}
             />
             <SystemHealth />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -127,6 +140,83 @@ const Index = () => {
         "model": "llama3:instruct",
         "prompt": "Based on {{$json.context}} and user's {{$json.goals}}, create a personalized lesson plan with..."
       }
+    },
+    {
+      "type": "function",
+      "name": "EvaluateEffectiveness",
+      "parameters": {
+        "jsCode": "const score = await $ai.evaluate($json.response, {
+          criteria: ['relevance', 'accuracy', 'personalization'],
+          threshold: 0.75
+        }); return { ...json, evaluation: score };"
+      }
+    },
+    {
+      "type": "function",
+      "name": "UpdateKnowledgeGraph",
+      "parameters": {
+        "jsCode": "if ($json.evaluation.score > 0.8) {
+          await $graph.addNode({
+            type: 'knowledge',
+            content: $json.response,
+            connections: $json.context.map(c => ({ id: c.id, weight: c.relevance }))
+          });
+        }
+        return $json;"
+      }
+    },
+    {
+      "type": "if",
+      "name": "RequiresAdaptation",
+      "parameters": {
+        "condition": "{{$json.evaluation.score < 0.75}}"
+      }
+    },
+    {
+      "type": "aiTool",
+      "name": "ImproveModel",
+      "parameters": {
+        "service": "local-ollama",
+        "model": "llama3:instruct",
+        "action": "finetune",
+        "data": "{{$json.historyWithEvaluations}}",
+        "parameters": {
+          "epochs": 3,
+          "learning_rate": 0.00002
+        }
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source": "UserInputCapture",
+      "target": "LogToDuckDB"
+    },
+    {
+      "source": "LogToDuckDB",
+      "target": "GenerateLessonPlan"
+    },
+    {
+      "source": "GenerateLessonPlan",
+      "target": "EvaluateEffectiveness"
+    },
+    {
+      "source": "EvaluateEffectiveness",
+      "target": "UpdateKnowledgeGraph"
+    },
+    {
+      "source": "EvaluateEffectiveness",
+      "target": "RequiresAdaptation"
+    },
+    {
+      "source": "RequiresAdaptation",
+      "target": "ImproveModel",
+      "condition": "true"
+    },
+    {
+      "source": "ImproveModel",
+      "target": "UserInputCapture",
+      "label": "Feedback Loop"
     }
   ]
 }`}

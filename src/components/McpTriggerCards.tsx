@@ -1,19 +1,25 @@
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { CircleArrowUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface McpTriggerCardsProps {
   triggerCount: {
     monitor: number;
     contextualize: number;
     personalize: number;
+    feedback?: number;
   };
   processingStage: string | null;
+  feedbackEnabled?: boolean;
 }
 
-const McpTriggerCards = ({ triggerCount, processingStage }: McpTriggerCardsProps) => {
+const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true }: McpTriggerCardsProps) => {
+  const gridCols = feedbackEnabled ? "grid-cols-1 md:grid-cols-4" : "grid-cols-1 md:grid-cols-3";
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className={`grid ${gridCols} gap-4`}>
       <Card className="bg-slate-800/50 border-slate-700">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg">Monitor Phase</CardTitle>
@@ -61,6 +67,31 @@ const McpTriggerCards = ({ triggerCount, processingStage }: McpTriggerCardsProps
           SQLite + MinIO Storage
         </CardFooter>
       </Card>
+      
+      {feedbackEnabled && (
+        <Card className="bg-slate-800/50 border-slate-700 relative overflow-hidden">
+          <div className={`absolute inset-0 bg-green-500/5 ${processingStage === "feedback" ? "animate-pulse" : ""}`}></div>
+          <CardHeader className="pb-2 relative">
+            <CardTitle className="text-lg flex items-center">
+              Feedback Loop
+              <Badge variant="outline" className="ml-2 bg-green-900/30 text-green-400 border-green-600 text-xs">
+                <CircleArrowUp className="h-3 w-3 mr-1" />
+                Learning
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-4xl font-bold">{triggerCount.feedback || 0}</div>
+            <p className="text-sm text-slate-400 mt-1">Self-improvement cycles</p>
+            {processingStage === "feedback" && (
+              <Progress value={65} className="h-1 mt-4" />
+            )}
+          </CardContent>
+          <CardFooter className="text-xs text-slate-500 pt-0 relative">
+            n8n + LLM Fine-tuning
+          </CardFooter>
+        </Card>
+      )}
     </div>
   );
 };

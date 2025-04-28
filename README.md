@@ -11,7 +11,7 @@ The Agent Console provides a powerful interface for interacting with the AI syst
 - **Example**:
   ```
   > help
-  Available commands: run workflow, query [db] [params], status, clear
+  Available commands: run workflow, query [db] [params], status, clear, feedback [on|off]
   ```
 
 ### `status`
@@ -24,6 +24,7 @@ The Agent Console provides a powerful interface for interacting with the AI syst
   McP processors: ACTIVE (3/3)
   Memory usage: 1.2GB / 4GB
   Storage status: CONNECTED
+  Feedback loop: ENABLED
   ```
 
 ### `clear`
@@ -44,6 +45,7 @@ The Agent Console provides a powerful interface for interacting with the AI syst
   1. Monitor: Captures user interaction
   2. Contextualize: Retrieves relevant knowledge vectors
   3. Personalize: Generates adaptive response
+  4. Feedback: Evaluates effectiveness and updates agent knowledge (when enabled)
 - **Example**:
   ```
   > run workflow
@@ -51,6 +53,23 @@ The Agent Console provides a powerful interface for interacting with the AI syst
   Monitor phase completed. User interaction stored in DuckDB.
   Contextualize phase completed. Knowledge vectors retrieved.
   Personalize phase completed. Response generated.
+  Feedback loop activated. Processing response effectiveness...
+  Adaptation complete. Agent knowledge graph updated.
+  ```
+
+### `feedback [on|off]`
+- **Description**: Controls the agent's self-learning feedback loop
+- **Usage**: Type `feedback on` or `feedback off`
+- **Example**:
+  ```
+  > feedback on
+  Feedback loop enabled. Agent will continuously learn from interactions.
+  
+  > feedback off
+  Feedback loop disabled. Agent will not adapt from interactions.
+  
+  > feedback
+  Current feedback status: ENABLED
   ```
 
 ## Database Interaction
@@ -78,3 +97,4 @@ Current Console Version: v0.4.2-alpha
 - Press Enter to execute a command
 - Use the command history for quick access to previous commands
 - The console provides real-time feedback for each command execution
+- The feedback loop enables continuous agent improvement and adaptation
