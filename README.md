@@ -1,7 +1,54 @@
 
 # Agent Console Commands
 
-The Agent Console provides a powerful interface for interacting with the AI system. Here's a comprehensive guide to the available commands:
+## Setup and Basic Usage
+
+### Installation
+
+1. **Clone the repository:**
+   ```
+   git clone https://github.com/your-username/adaptive-agent-nexus.git
+   cd adaptive-agent-nexus
+   ```
+
+2. **Install dependencies:**
+   ```
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```
+   npm run dev
+   ```
+
+4. **Open in browser:**
+   Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
+
+### Testing the Voice Interface
+
+1. **Enable your microphone:**
+   - When prompted by your browser, allow microphone access
+   - Click the microphone button to activate voice input
+   - Say a command clearly (e.g., "help", "status", or "run workflow")
+
+2. **Test voice output:**
+   - Ensure your speakers are turned on
+   - Click the speaker button to enable voice output if it's not already on
+   - The system will respond to your commands with voice synthesis
+
+### Quick Command Test
+
+To verify the system is working correctly, try these simple commands:
+
+1. Type or say `help` to see available commands
+2. Type or say `status` to check system status
+3. Type or say `run workflow` to test the McP workflow process
+
+### Troubleshooting
+
+- If voice recognition isn't working, check that your browser supports the Web Speech API (Chrome recommended)
+- Make sure your microphone is properly connected and has permission
+- If voice output isn't audible, check your system volume and browser audio settings
 
 ## Basic Commands
 
