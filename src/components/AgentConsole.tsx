@@ -42,12 +42,20 @@ const AgentConsole = () => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [speechRecognitionSupported, setSpeechRecognitionSupported] = useState(false);
   const speechRecognitionRef = useRef<SpeechRecognition | null>(null);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Initialize speech recognition
   useEffect(() => {
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+    // Check if speech recognition is supported
+    const isSpeechRecognitionSupported = 
+      'SpeechRecognition' in window || 
+      'webkitSpeechRecognition' in window;
+    
+    setSpeechRecognitionSupported(isSpeechRecognitionSupported);
+    
+    if (isSpeechRecognitionSupported) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       speechRecognitionRef.current = new SpeechRecognition();
       speechRecognitionRef.current.continuous = false;
@@ -69,17 +77,27 @@ const AgentConsole = () => {
         addLog("error", "Speech recognition error. Please try again.");
       };
     } else {
-      addLog("error", "Speech recognition not supported in this browser.");
+      // Log once to console instead of repeatedly showing UI alerts
+      console.log("Speech recognition not supported in this browser.");
+      addLog("error", "Speech recognition not supported in this browser. Voice input disabled.");
     }
 
-    // Initialize speech synthesis
-    speechSynthesisRef.current = new SpeechSynthesisUtterance();
+    // Initialize speech synthesis if available
+    if ('speechSynthesis' in window) {
+      speechSynthesisRef.current = new SpeechSynthesisUtterance();
+    } else {
+      console.log("Speech synthesis not supported in this browser.");
+      addLog("error", "Speech synthesis not supported in this browser. Voice output disabled.");
+      setVoiceEnabled(false);
+    }
     
     return () => {
       if (speechRecognitionRef.current) {
         speechRecognitionRef.current.abort();
       }
-      window.speechSynthesis.cancel();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
     };
   }, []);
 
@@ -100,20 +118,27 @@ const AgentConsole = () => {
   };
 
   const speakText = (text) => {
-    if (!voiceEnabled) return;
+    if (!voiceEnabled || !speechSynthesisRef.current || !('speechSynthesis' in window)) return;
     
-    if (speechSynthesisRef.current) {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
-      
-      setIsSpeaking(true);
-      speechSynthesisRef.current.text = text;
-      speechSynthesisRef.current.onend = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(speechSynthesisRef.current);
-    }
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    setIsSpeaking(true);
+    speechSynthesisRef.current.text = text;
+    speechSynthesisRef.current.onend = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(speechSynthesisRef.current);
   };
 
   const toggleListening = () => {
+    if (!speechRecognitionSupported) {
+      toast({
+        title: "Speech Recognition Not Available",
+        description: "Your browser doesn't support speech recognition. Please try a browser like Chrome or Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (isListening) {
       if (speechRecognitionRef.current) {
         speechRecognitionRef.current.abort();
@@ -134,6 +159,15 @@ const AgentConsole = () => {
   };
 
   const toggleVoiceOutput = () => {
+    if (!('speechSynthesis' in window) && !voiceEnabled) {
+      toast({
+        title: "Speech Synthesis Not Available",
+        description: "Your browser doesn't support speech synthesis. Please try a browser like Chrome or Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setVoiceEnabled(!voiceEnabled);
     addLog("system", `Voice output ${!voiceEnabled ? 'enabled' : 'disabled'}.`);
   };
@@ -296,7 +330,7 @@ const AgentConsole = () => {
               pressed={isListening}
               onPressedChange={toggleListening}
               aria-label="Toggle voice input"
-              className={`${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+              className={`${isListening ? 'bg-red-500 hover:bg-red-600' : speechRecognitionSupported ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-500 hover:bg-gray-600 opacity-50'} text-white`}
             >
               {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Toggle>
@@ -304,7 +338,7 @@ const AgentConsole = () => {
               pressed={voiceEnabled}
               onPressedChange={toggleVoiceOutput}
               aria-label="Toggle voice output"
-              className={`${voiceEnabled ? 'bg-purple-500 hover:bg-purple-600' : 'bg-slate-500 hover:bg-slate-600'} text-white`}
+              className={`${voiceEnabled ? 'bg-purple-500 hover:bg-purple-600' : ('speechSynthesis' in window) ? 'bg-slate-500 hover:bg-slate-600' : 'bg-gray-500 hover:bg-gray-600 opacity-50'} text-white`}
             >
               {voiceEnabled ? <Volume className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Toggle>
