@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CircleArrowUp, Database, Vector, UserCog, RefreshCw } from "lucide-react";
+import { CircleArrowUp, Database, Waves, UserCog, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface McpTriggerCardsProps {
@@ -31,7 +31,7 @@ const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true
           <div className="text-4xl font-bold text-blue-300">{triggerCount.monitor}</div>
           <p className="text-sm text-slate-400 mt-1">Total triggers captured</p>
           {processingStage === "monitor" && (
-            <Progress value={45} className="h-1 mt-4 bg-slate-700" indicatorClassName="bg-blue-500" />
+            <Progress value={45} className="h-1 mt-4 bg-slate-700" />
           )}
         </CardContent>
         <CardFooter className="text-xs text-slate-500 pt-0">
@@ -42,7 +42,7 @@ const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true
       <Card className="bg-gradient-to-br from-slate-800/90 to-slate-900 border-slate-700 shadow-lg hover:shadow-slate-700/20 transition-all duration-200 hover:-translate-y-1">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
-            <Vector className="h-4 w-4 mr-2 text-purple-400" />
+            <Waves className="h-4 w-4 mr-2 text-purple-400" />
             Contextualize Phase
           </CardTitle>
         </CardHeader>
@@ -50,7 +50,7 @@ const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true
           <div className="text-4xl font-bold text-purple-300">{triggerCount.contextualize}</div>
           <p className="text-sm text-slate-400 mt-1">Context enrichments</p>
           {processingStage === "contextualize" && (
-            <Progress value={60} className="h-1 mt-4 bg-slate-700" indicatorClassName="bg-purple-500" />
+            <Progress value={60} className="h-1 mt-4 bg-slate-700" />
           )}
         </CardContent>
         <CardFooter className="text-xs text-slate-500 pt-0">
@@ -69,7 +69,7 @@ const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true
           <div className="text-4xl font-bold text-green-300">{triggerCount.personalize}</div>
           <p className="text-sm text-slate-400 mt-1">Adaptive responses</p>
           {processingStage === "personalize" && (
-            <Progress value={80} className="h-1 mt-4 bg-slate-700" indicatorClassName="bg-green-500" />
+            <Progress value={80} className="h-1 mt-4 bg-slate-700" />
           )}
         </CardContent>
         <CardFooter className="text-xs text-slate-500 pt-0">
@@ -94,7 +94,7 @@ const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true
             <div className="text-4xl font-bold text-amber-300">{triggerCount.feedback || 0}</div>
             <p className="text-sm text-slate-400 mt-1">Self-improvement cycles</p>
             {processingStage === "feedback" && (
-              <Progress value={65} className="h-1 mt-4 bg-slate-700" indicatorClassName="bg-amber-500" />
+              <Progress value={65} className="h-1 mt-4 bg-slate-700" />
             )}
           </CardContent>
           <CardFooter className="text-xs text-slate-500 pt-0 relative">
