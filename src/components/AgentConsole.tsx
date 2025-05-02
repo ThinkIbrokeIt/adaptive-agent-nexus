@@ -7,6 +7,8 @@ import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { LogEntry, SearchResult } from "@/types/agent";
 import ConsoleLog from "./agent-console/ConsoleLog";
 import CommandInput from "./agent-console/CommandInput";
+import AgentStatus from "./agent-console/AgentStatus";
+import { useAgentNetwork } from "@/contexts/AgentNetworkContext";
 
 const AgentConsole = () => {
   const [logs, setLogs] = useState<LogEntry[]>([
@@ -47,6 +49,9 @@ const AgentConsole = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const { speakText } = useSpeechSynthesis();
   const [isSearching, setIsSearching] = useState(false);
+  
+  // Add agent network context
+  const agentNetwork = useAgentNetwork();
 
   const addLog = (type: LogEntry["type"], message: string) => {
     const newLog: LogEntry = { 
@@ -63,34 +68,50 @@ const AgentConsole = () => {
     }
   };
 
-  const handleCommand = (commandText: string) => {
+  const handleCommand = async (commandText: string) => {
+    // Add the command to the log
     addLog("command", commandText);
     
-    // Process command
-    if (commandText.toLowerCase().includes("run") && commandText.toLowerCase().includes("workflow")) {
-      processWorkflowCommand();
-    } else if (commandText.toLowerCase().includes("query")) {
-      processQueryCommand();
-    } else if (commandText.toLowerCase().includes("help")) {
-      processHelpCommand();
-    } else if (commandText.toLowerCase().includes("status")) {
-      processStatusCommand();
-    } else if (commandText.toLowerCase().includes("clear")) {
-      processClearCommand();
-    } else if (commandText.toLowerCase().includes("feedback")) {
-      processFeedbackCommand(commandText);
-    } else if (commandText.toLowerCase().includes("voice")) {
-      processVoiceCommand(commandText);
-    } else if (commandText.toLowerCase().startsWith("search ")) {
-      processSearchCommand(commandText);
-    } else if (commandText.toLowerCase().includes("tell me about")) {
-      processTellMeAboutCommand(commandText);
-    } else {
-      processConversationalQuery(commandText);
+    try {
+      // Process the command through the agent network
+      const result = await agentNetwork.processCommand(commandText);
+      
+      if (result.error) {
+        addLog("error", result.error);
+        return;
+      }
+      
+      // Log which agent handled the command
+      addLog("system", `${result.agent} is processing your request...`);
+      
+      // Based on the result type, execute appropriate processing
+      switch (result.type) {
+        case "search":
+          processSearchCommand(`search ${result.result.split(": ")[1]}`);
+          break;
+        case "workflow":
+          processWorkflowCommand();
+          break;
+        case "data-query":
+          processQueryCommand();
+          break;
+        case "learning":
+          const topic = result.result.split(": ")[1];
+          addLog("info", `Learning about "${topic}" has been completed.`);
+          addLog("success", `${result.agent} has added new information about "${topic}" to the knowledge base.`);
+          break;
+        case "conversation":
+          addLog("info", `Response: ${result.result.split(": ")[1]}`);
+          break;
+        default:
+          processConversationalQuery(commandText);
+      }
+    } catch (error) {
+      addLog("error", `Error processing command: ${error}`);
     }
     
     toast({
-      title: "Command Executed",
+      title: "Command Processed",
       description: commandText,
     });
   };
@@ -126,7 +147,8 @@ const AgentConsole = () => {
   };
 
   const processHelpCommand = () => {
-    addLog("info", "Available commands: run workflow, query [db] [params], status, clear, search [query], feedback [on|off], voice [on|off]");
+    addLog("info", "Available commands: run workflow, query [db] [params], status, clear, search [query], feedback [on|off], voice [on|off], learn [topic]");
+    addLog("info", "You can also direct commands to specific agents: @research search for [topic], @workflow run [name], @data query [database], @learning study [topic]");
   };
 
   const processStatusCommand = () => {
@@ -136,6 +158,12 @@ const AgentConsole = () => {
     addLog("info", "Storage status: CONNECTED");
     addLog("info", `Feedback loop: ${feedbackEnabled ? "ENABLED" : "DISABLED"}`);
     addLog("info", `Voice interface: ${voiceEnabled ? "ENABLED" : "DISABLED"}`);
+    
+    // Add agent network status
+    addLog("info", "Agent network: OPERATIONAL");
+    agentNetwork.network.agents.forEach(agent => {
+      addLog("info", `${agent.name}: ${agent.status.toUpperCase()}`);
+    });
   };
 
   const processClearCommand = () => {
@@ -172,15 +200,21 @@ const AgentConsole = () => {
 
   const processTellMeAboutCommand = (commandText: string) => {
     const topic = commandText.toLowerCase().replace("tell me about", "").trim();
-    addLog("system", `Retrieving information about "${topic}"...`);
     
     if (topic.length > 0) {
-      // Check if we need to search for more information
-      const knownTopics = ["mcp", "workflows", "feedback loops", "adaptive learning"];
-      const isKnown = knownTopics.some(t => topic.includes(t));
+      const researchAgents = agentNetwork.getAgentsByCapability("search");
       
-      if (!isKnown) {
-        addLog("system", `Limited information found. Initiating search for "${topic}"...`);
+      if (researchAgents.length > 0) {
+        addLog("system", `Delegating research on "${topic}" to ${researchAgents[0].name}...`);
+        
+        agentNetwork.sendAgentMessage({
+          from: "primary-agent",
+          to: researchAgents[0].id,
+          content: { topic },
+          type: "request"
+        });
+        
+        // Then continue with the existing search logic
         setTimeout(() => {
           processSearchCommand(`search ${topic}`);
         }, 1000);
@@ -189,8 +223,26 @@ const AgentConsole = () => {
     }
     
     setTimeout(() => {
-      addLog("info", `${topic} is part of the agent's knowledge base. It relates to adaptive learning systems that continuously evolve through feedback loops and context-aware interactions.`);
-    }, 1500);
+      addLog("system", `Retrieving information about "${topic}"...`);
+      
+      if (topic.length > 0) {
+        // Check if we need to search for more information
+        const knownTopics = ["mcp", "workflows", "feedback loops", "adaptive learning"];
+        const isKnown = knownTopics.some(t => topic.includes(t));
+        
+        if (!isKnown) {
+          addLog("system", `Limited information found. Initiating search for "${topic}"...`);
+          setTimeout(() => {
+            processSearchCommand(`search ${topic}`);
+          }, 1000);
+          return;
+        }
+      }
+      
+      setTimeout(() => {
+        addLog("info", `${topic} is part of the agent's knowledge base. It relates to adaptive learning systems that continuously evolve through feedback loops and context-aware interactions.`);
+      }, 1500);
+    }, 2000);
   };
 
   const processSearchCommand = (commandText: string) => {
@@ -293,10 +345,11 @@ const AgentConsole = () => {
                 </Badge>
               )}
             </div>
-            <Badge variant="outline" className="font-mono">v0.6.0-alpha</Badge>
+            <Badge variant="outline" className="font-mono">v0.7.0-alpha</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <AgentStatus agents={agentNetwork.network.agents} />
           <ConsoleLog logs={logs} />
         </CardContent>
         <CardFooter>
