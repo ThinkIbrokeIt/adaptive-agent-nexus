@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { CircleArrowUp } from "lucide-react";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
-import { LogEntry } from "@/types/agent";
+import { LogEntry, SearchResult } from "@/types/agent";
 import ConsoleLog from "./agent-console/ConsoleLog";
 import CommandInput from "./agent-console/CommandInput";
 
@@ -35,6 +34,11 @@ const AgentConsole = () => {
       timestamp: new Date("2025-04-23T14:32:25Z").toISOString(),
       type: "system",
       message: "Voice interface activated. You can now speak to the agent.",
+    },
+    {
+      timestamp: new Date("2025-04-23T14:32:30Z").toISOString(),
+      type: "system",
+      message: "Search capability enabled. You can search for information using the 'search' command.",
     }
   ]);
   const { toast } = useToast();
@@ -42,6 +46,7 @@ const AgentConsole = () => {
   const [isListening, setIsListening] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const { speakText } = useSpeechSynthesis();
+  const [isSearching, setIsSearching] = useState(false);
 
   const addLog = (type: LogEntry["type"], message: string) => {
     const newLog: LogEntry = { 
@@ -76,6 +81,8 @@ const AgentConsole = () => {
       processFeedbackCommand(commandText);
     } else if (commandText.toLowerCase().includes("voice")) {
       processVoiceCommand(commandText);
+    } else if (commandText.toLowerCase().startsWith("search ")) {
+      processSearchCommand(commandText);
     } else if (commandText.toLowerCase().includes("tell me about")) {
       processTellMeAboutCommand(commandText);
     } else {
@@ -119,7 +126,7 @@ const AgentConsole = () => {
   };
 
   const processHelpCommand = () => {
-    addLog("info", "Available commands: run workflow, query [db] [params], status, clear, feedback [on|off], voice [on|off]");
+    addLog("info", "Available commands: run workflow, query [db] [params], status, clear, search [query], feedback [on|off], voice [on|off]");
   };
 
   const processStatusCommand = () => {
@@ -166,13 +173,101 @@ const AgentConsole = () => {
   const processTellMeAboutCommand = (commandText: string) => {
     const topic = commandText.toLowerCase().replace("tell me about", "").trim();
     addLog("system", `Retrieving information about "${topic}"...`);
+    
+    if (topic.length > 0) {
+      // Check if we need to search for more information
+      const knownTopics = ["mcp", "workflows", "feedback loops", "adaptive learning"];
+      const isKnown = knownTopics.some(t => topic.includes(t));
+      
+      if (!isKnown) {
+        addLog("system", `Limited information found. Initiating search for "${topic}"...`);
+        setTimeout(() => {
+          processSearchCommand(`search ${topic}`);
+        }, 1000);
+        return;
+      }
+    }
+    
     setTimeout(() => {
       addLog("info", `${topic} is part of the agent's knowledge base. It relates to adaptive learning systems that continuously evolve through feedback loops and context-aware interactions.`);
     }, 1500);
   };
 
+  const processSearchCommand = (commandText: string) => {
+    const query = commandText.toLowerCase().replace("search", "").trim();
+    
+    if (!query) {
+      addLog("error", "Please provide a search query. Example: search artificial intelligence");
+      return;
+    }
+    
+    addLog("system", `Searching for "${query}"...`);
+    setIsSearching(true);
+    
+    // Simulate search operation
+    setTimeout(() => {
+      const mockResults: SearchResult[] = [
+        {
+          title: `Research Paper: Advances in ${query}`,
+          snippet: `Recent developments in ${query} show promising results for adaptive learning systems and contextual awareness.`,
+          url: `https://research.example.com/${query.replace(/\s+/g, '-')}`
+        },
+        {
+          title: `Understanding ${query} in Modern Systems`,
+          snippet: `${query} has revolutionized how we approach data processing and contextual learning in AI frameworks.`,
+          url: `https://academy.example.com/topics/${query.replace(/\s+/g, '-')}`
+        },
+        {
+          title: `${query} Implementation Guide`,
+          snippet: `Step-by-step instructions for implementing ${query} in your McP workflow architecture.`,
+          url: `https://docs.example.com/guides/${query.replace(/\s+/g, '-')}`
+        }
+      ];
+      
+      addLog("search", JSON.stringify(mockResults));
+      
+      setTimeout(() => {
+        addLog("success", `Search completed. Found ${mockResults.length} relevant results for "${query}".`);
+        addLog("system", "Knowledge base updated with new information.");
+        setIsSearching(false);
+      }, 500);
+    }, 2000);
+  };
+
   const processConversationalQuery = (commandText: string) => {
     addLog("system", "Processing conversational query...");
+    
+    // Check if we need to search for information to answer this query
+    const searchTerms = [
+      "what is", "how does", "explain", "who is", "when was", "where is",
+      "why is", "can you tell me about", "information on", "data on"
+    ];
+    
+    const shouldSearch = searchTerms.some(term => commandText.toLowerCase().includes(term));
+    
+    if (shouldSearch) {
+      // Extract potential search topic
+      let searchQuery = commandText;
+      searchTerms.forEach(term => {
+        if (commandText.toLowerCase().includes(term)) {
+          searchQuery = commandText.toLowerCase().split(term)[1].trim();
+          return;
+        }
+      });
+      
+      if (searchQuery && searchQuery !== commandText) {
+        addLog("system", `Searching for more information on "${searchQuery}" to provide a better response...`);
+        setTimeout(() => {
+          processSearchCommand(`search ${searchQuery}`);
+        }, 1000);
+        
+        setTimeout(() => {
+          addLog("info", `Based on the search results and my knowledge, ${searchQuery} is related to advanced information processing and adaptive systems. The McP framework can incorporate this information to enhance contextual understanding.`);
+        }, 4500);
+        return;
+      }
+    }
+    
     setTimeout(() => {
       addLog("info", `Response to "${commandText}": I'm designed to assist with McP workflow operations and knowledge retrieval. My capabilities include monitoring user interactions, contextualizing data, personalizing responses, and learning through feedback loops.`);
     }, 1500);
@@ -185,6 +280,12 @@ const AgentConsole = () => {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span>Agent Console</span>
+              {isSearching && (
+                <Badge variant="outline" className="ml-2 bg-blue-900/30 text-blue-400 border-blue-600">
+                  <span className="inline-block h-2 w-2 rounded-full bg-blue-400 mr-1 animate-ping"></span>
+                  Searching
+                </Badge>
+              )}
               {feedbackEnabled && (
                 <Badge variant="outline" className="ml-2 bg-green-900/30 text-green-400 border-green-600">
                   <CircleArrowUp className="h-3 w-3 mr-1 animate-pulse" />
@@ -192,7 +293,7 @@ const AgentConsole = () => {
                 </Badge>
               )}
             </div>
-            <Badge variant="outline" className="font-mono">v0.5.0-alpha</Badge>
+            <Badge variant="outline" className="font-mono">v0.6.0-alpha</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
