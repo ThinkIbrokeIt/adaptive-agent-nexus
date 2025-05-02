@@ -68,6 +68,11 @@ const AgentNetworkContext = createContext<AgentNetworkContextType | undefined>(u
 export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [network, setNetwork] = useState<AgentNetwork>(initialAgentNetwork);
 
+  useEffect(() => {
+    // Log a test UUID to verify the library is working
+    console.log("Testing UUID generation:", uuidv4());
+  }, []);
+
   const sendAgentMessage = (message: Omit<AgentMessage, "timestamp">) => {
     const newMessage: AgentMessage = {
       ...message,
