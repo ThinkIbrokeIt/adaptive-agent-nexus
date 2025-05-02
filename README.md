@@ -1,3 +1,4 @@
+
 # Adaptive Agent Nexus
 
 ## Introduction
@@ -11,7 +12,24 @@ The Adaptive Agent Nexus is an intelligent system designed to bring context-awar
 
 The system solves critical challenges in traditional AI implementations, including context amnesia, static knowledge representation, and one-size-fits-all responses. Through its adaptable architecture, the platform bridges the gap between raw data collection and meaningful, personalized agent interactions.
 
-### Future Roadmap
+## Architecture
+
+The system is built with a modular architecture that separates concerns:
+
+- **Agent Network**: Manages the coordination between specialized agents
+- **Command Processing**: Handles different types of user commands via dedicated processors
+- **Workflow Engine**: Implements the McP workflow architecture
+- **Voice Interface**: Provides natural language interaction capabilities
+
+### Agent Types
+
+- **Primary Agent**: Handles general conversations and coordinates other agents
+- **Research Agent**: Performs search and information gathering
+- **Workflow Agent**: Executes the McP workflow processes
+- **Data Agent**: Manages database queries and data analysis
+- **Learning Agent**: Responsible for adapting the system based on feedback
+
+## Future Roadmap
 
 We're exploring several exciting enhancements to the platform:
 
@@ -199,7 +217,7 @@ The agent can also respond to natural language questions and commands that don't
 
 ## Versions
 
-Current Console Version: v0.5.0-alpha
+Current Console Version: v0.5.1-alpha
 
 ## Quick Tips
 - Press Enter to execute a typed command
