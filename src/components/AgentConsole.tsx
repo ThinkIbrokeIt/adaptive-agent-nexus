@@ -1,329 +1,58 @@
-import { useState, useEffect } from "react";
+
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
 import { CircleArrowUp } from "lucide-react";
-import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
-import { LogEntry, SearchResult } from "@/types/agent";
+import { LogEntry } from "@/types/agent";
+import { useAgentNetwork } from "@/contexts/AgentNetworkContext";
+import { useAgentCommands } from "@/hooks/useAgentCommands";
 import ConsoleLog from "./agent-console/ConsoleLog";
 import CommandInput from "./agent-console/CommandInput";
 import AgentStatus from "./agent-console/AgentStatus";
-import { useAgentNetwork } from "@/contexts/AgentNetworkContext";
+
+const initialLogs: LogEntry[] = [
+  {
+    timestamp: new Date("2025-04-23T14:32:05Z").toISOString(),
+    type: "system",
+    message: "Agent system initialized. McP framework ready.",
+  },
+  {
+    timestamp: new Date("2025-04-23T14:32:10Z").toISOString(),
+    type: "info",
+    message: "Storage integrations connected: DuckDB, ChromaDB, SQLite, MinIO.",
+  },
+  {
+    timestamp: new Date("2025-04-23T14:32:15Z").toISOString(),
+    type: "info",
+    message: "Local LLM initialized using llama3:instruct model.",
+  },
+  {
+    timestamp: new Date("2025-04-23T14:32:20Z").toISOString(),
+    type: "system",
+    message: "Feedback loop enabled. Agent will continuously learn from interactions.",
+  },
+  {
+    timestamp: new Date("2025-04-23T14:32:25Z").toISOString(),
+    type: "system",
+    message: "Voice interface activated. You can now speak to the agent.",
+  },
+  {
+    timestamp: new Date("2025-04-23T14:32:30Z").toISOString(),
+    type: "system",
+    message: "Search capability enabled. You can search for information using the 'search' command.",
+  }
+];
 
 const AgentConsole = () => {
-  const [logs, setLogs] = useState<LogEntry[]>([
-    {
-      timestamp: new Date("2025-04-23T14:32:05Z").toISOString(),
-      type: "system",
-      message: "Agent system initialized. McP framework ready.",
-    },
-    {
-      timestamp: new Date("2025-04-23T14:32:10Z").toISOString(),
-      type: "info",
-      message: "Storage integrations connected: DuckDB, ChromaDB, SQLite, MinIO.",
-    },
-    {
-      timestamp: new Date("2025-04-23T14:32:15Z").toISOString(),
-      type: "info",
-      message: "Local LLM initialized using llama3:instruct model.",
-    },
-    {
-      timestamp: new Date("2025-04-23T14:32:20Z").toISOString(),
-      type: "system",
-      message: "Feedback loop enabled. Agent will continuously learn from interactions.",
-    },
-    {
-      timestamp: new Date("2025-04-23T14:32:25Z").toISOString(),
-      type: "system",
-      message: "Voice interface activated. You can now speak to the agent.",
-    },
-    {
-      timestamp: new Date("2025-04-23T14:32:30Z").toISOString(),
-      type: "system",
-      message: "Search capability enabled. You can search for information using the 'search' command.",
-    }
-  ]);
-  const { toast } = useToast();
-  const [feedbackEnabled, setFeedbackEnabled] = useState(true);
-  const [isListening, setIsListening] = useState(false);
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const { speakText } = useSpeechSynthesis();
-  const [isSearching, setIsSearching] = useState(false);
-  
-  // Add agent network context
   const agentNetwork = useAgentNetwork();
-
-  const addLog = (type: LogEntry["type"], message: string) => {
-    const newLog: LogEntry = { 
-      timestamp: new Date().toISOString(),
-      type, 
-      message 
-    };
-    
-    setLogs(prev => [...prev, newLog]);
-
-    // Speak response for certain message types if voice is enabled
-    if (voiceEnabled && (type === "info" || type === "success" || type === "system")) {
-      speakText(message);
-    }
-  };
-
-  const handleCommand = async (commandText: string) => {
-    // Add the command to the log
-    addLog("command", commandText);
-    
-    try {
-      // Process the command through the agent network
-      const result = await agentNetwork.processCommand(commandText);
-      
-      if (result.error) {
-        addLog("error", result.error);
-        return;
-      }
-      
-      // Log which agent handled the command
-      addLog("system", `${result.agent} is processing your request...`);
-      
-      // Based on the result type, execute appropriate processing
-      switch (result.type) {
-        case "search":
-          processSearchCommand(`search ${result.result.split(": ")[1]}`);
-          break;
-        case "workflow":
-          processWorkflowCommand();
-          break;
-        case "data-query":
-          processQueryCommand();
-          break;
-        case "learning":
-          const topic = result.result.split(": ")[1];
-          addLog("info", `Learning about "${topic}" has been completed.`);
-          addLog("success", `${result.agent} has added new information about "${topic}" to the knowledge base.`);
-          break;
-        case "conversation":
-          addLog("info", `Response: ${result.result.split(": ")[1]}`);
-          break;
-        default:
-          processConversationalQuery(commandText);
-      }
-    } catch (error) {
-      addLog("error", `Error processing command: ${error}`);
-    }
-    
-    toast({
-      title: "Command Processed",
-      description: commandText,
-    });
-  };
-
-  // Command processing methods
-  const processWorkflowCommand = () => {
-    addLog("system", "Initiating McP workflow...");
-    setTimeout(() => {
-      addLog("success", "Monitor phase completed. User interaction stored in DuckDB.");
-    }, 1000);
-    setTimeout(() => {
-      addLog("success", "Contextualize phase completed. Knowledge vectors retrieved.");
-    }, 3000);
-    setTimeout(() => {
-      addLog("success", "Personalize phase completed. Response generated.");
-      
-      if (feedbackEnabled) {
-        setTimeout(() => {
-          addLog("info", "Feedback loop activated. Processing response effectiveness...");
-        }, 1000);
-        setTimeout(() => {
-          addLog("success", "Adaptation complete. Agent knowledge graph updated.");
-        }, 3000);
-      }
-    }, 5000);
-  };
-
-  const processQueryCommand = () => {
-    addLog("system", "Executing database query...");
-    setTimeout(() => {
-      addLog("info", "Query returned 5 results.");
-    }, 1500);
-  };
-
-  const processHelpCommand = () => {
-    addLog("info", "Available commands: run workflow, query [db] [params], status, clear, search [query], feedback [on|off], voice [on|off], learn [topic]");
-    addLog("info", "You can also direct commands to specific agents: @research search for [topic], @workflow run [name], @data query [database], @learning study [topic]");
-  };
-
-  const processStatusCommand = () => {
-    addLog("info", "System status: OPERATIONAL");
-    addLog("info", "McP processors: ACTIVE (3/3)");
-    addLog("info", "Memory usage: 1.2GB / 4GB");
-    addLog("info", "Storage status: CONNECTED");
-    addLog("info", `Feedback loop: ${feedbackEnabled ? "ENABLED" : "DISABLED"}`);
-    addLog("info", `Voice interface: ${voiceEnabled ? "ENABLED" : "DISABLED"}`);
-    
-    // Add agent network status
-    addLog("info", "Agent network: OPERATIONAL");
-    agentNetwork.network.agents.forEach(agent => {
-      addLog("info", `${agent.name}: ${agent.status.toUpperCase()}`);
-    });
-  };
-
-  const processClearCommand = () => {
-    setLogs([{
-      timestamp: new Date().toISOString(),
-      type: "system",
-      message: "Console cleared."
-    }]);
-  };
-
-  const processFeedbackCommand = (commandText: string) => {
-    if (commandText.toLowerCase().includes("on")) {
-      setFeedbackEnabled(true);
-      addLog("success", "Feedback loop enabled. Agent will continuously learn from interactions.");
-    } else if (commandText.toLowerCase().includes("off")) {
-      setFeedbackEnabled(false);
-      addLog("info", "Feedback loop disabled. Agent will not adapt from interactions.");
-    } else {
-      addLog("info", `Current feedback status: ${feedbackEnabled ? "ENABLED" : "DISABLED"}`);
-    }
-  };
-
-  const processVoiceCommand = (commandText: string) => {
-    if (commandText.toLowerCase().includes("on")) {
-      setVoiceEnabled(true);
-      addLog("success", "Voice output enabled.");
-    } else if (commandText.toLowerCase().includes("off")) {
-      setVoiceEnabled(false);
-      addLog("info", "Voice output disabled.");
-    } else {
-      addLog("info", `Current voice status: ${voiceEnabled ? "ENABLED" : "DISABLED"}`);
-    }
-  };
-
-  const processTellMeAboutCommand = (commandText: string) => {
-    const topic = commandText.toLowerCase().replace("tell me about", "").trim();
-    
-    if (topic.length > 0) {
-      const researchAgents = agentNetwork.getAgentsByCapability("search");
-      
-      if (researchAgents.length > 0) {
-        addLog("system", `Delegating research on "${topic}" to ${researchAgents[0].name}...`);
-        
-        agentNetwork.sendAgentMessage({
-          from: "primary-agent",
-          to: researchAgents[0].id,
-          content: { topic },
-          type: "request"
-        });
-        
-        // Then continue with the existing search logic
-        setTimeout(() => {
-          processSearchCommand(`search ${topic}`);
-        }, 1000);
-        return;
-      }
-    }
-    
-    setTimeout(() => {
-      addLog("system", `Retrieving information about "${topic}"...`);
-      
-      if (topic.length > 0) {
-        // Check if we need to search for more information
-        const knownTopics = ["mcp", "workflows", "feedback loops", "adaptive learning"];
-        const isKnown = knownTopics.some(t => topic.includes(t));
-        
-        if (!isKnown) {
-          addLog("system", `Limited information found. Initiating search for "${topic}"...`);
-          setTimeout(() => {
-            processSearchCommand(`search ${topic}`);
-          }, 1000);
-          return;
-        }
-      }
-      
-      setTimeout(() => {
-        addLog("info", `${topic} is part of the agent's knowledge base. It relates to adaptive learning systems that continuously evolve through feedback loops and context-aware interactions.`);
-      }, 1500);
-    }, 2000);
-  };
-
-  const processSearchCommand = (commandText: string) => {
-    const query = commandText.toLowerCase().replace("search", "").trim();
-    
-    if (!query) {
-      addLog("error", "Please provide a search query. Example: search artificial intelligence");
-      return;
-    }
-    
-    addLog("system", `Searching for "${query}"...`);
-    setIsSearching(true);
-    
-    // Simulate search operation
-    setTimeout(() => {
-      const mockResults: SearchResult[] = [
-        {
-          title: `Research Paper: Advances in ${query}`,
-          snippet: `Recent developments in ${query} show promising results for adaptive learning systems and contextual awareness.`,
-          url: `https://research.example.com/${query.replace(/\s+/g, '-')}`
-        },
-        {
-          title: `Understanding ${query} in Modern Systems`,
-          snippet: `${query} has revolutionized how we approach data processing and contextual learning in AI frameworks.`,
-          url: `https://academy.example.com/topics/${query.replace(/\s+/g, '-')}`
-        },
-        {
-          title: `${query} Implementation Guide`,
-          snippet: `Step-by-step instructions for implementing ${query} in your McP workflow architecture.`,
-          url: `https://docs.example.com/guides/${query.replace(/\s+/g, '-')}`
-        }
-      ];
-      
-      addLog("search", JSON.stringify(mockResults));
-      
-      setTimeout(() => {
-        addLog("success", `Search completed. Found ${mockResults.length} relevant results for "${query}".`);
-        addLog("system", "Knowledge base updated with new information.");
-        setIsSearching(false);
-      }, 500);
-    }, 2000);
-  };
-
-  const processConversationalQuery = (commandText: string) => {
-    addLog("system", "Processing conversational query...");
-    
-    // Check if we need to search for information to answer this query
-    const searchTerms = [
-      "what is", "how does", "explain", "who is", "when was", "where is",
-      "why is", "can you tell me about", "information on", "data on"
-    ];
-    
-    const shouldSearch = searchTerms.some(term => commandText.toLowerCase().includes(term));
-    
-    if (shouldSearch) {
-      // Extract potential search topic
-      let searchQuery = commandText;
-      searchTerms.forEach(term => {
-        if (commandText.toLowerCase().includes(term)) {
-          searchQuery = commandText.toLowerCase().split(term)[1].trim();
-          return;
-        }
-      });
-      
-      if (searchQuery && searchQuery !== commandText) {
-        addLog("system", `Searching for more information on "${searchQuery}" to provide a better response...`);
-        setTimeout(() => {
-          processSearchCommand(`search ${searchQuery}`);
-        }, 1000);
-        
-        setTimeout(() => {
-          addLog("info", `Based on the search results and my knowledge, ${searchQuery} is related to advanced information processing and adaptive systems. The McP framework can incorporate this information to enhance contextual understanding.`);
-        }, 4500);
-        return;
-      }
-    }
-    
-    setTimeout(() => {
-      addLog("info", `Response to "${commandText}": I'm designed to assist with McP workflow operations and knowledge retrieval. My capabilities include monitoring user interactions, contextualizing data, personalizing responses, and learning through feedback loops.`);
-    }, 1500);
-  };
+  const { 
+    logs, 
+    isListening, 
+    isSearching, 
+    feedbackEnabled,
+    voiceEnabled,
+    setVoiceEnabled,
+    handleCommand
+  } = useAgentCommands(initialLogs);
 
   return (
     <div className="grid grid-cols-1 gap-4">
