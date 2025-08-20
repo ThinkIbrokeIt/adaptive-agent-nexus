@@ -10,6 +10,7 @@ import AgentConsole from "@/components/AgentConsole";
 import Header from "@/components/Header";
 import DashboardTab from "@/components/dashboard/DashboardTab";
 import WorkflowsTab from "@/components/dashboard/WorkflowsTab";
+import FeatureTester from "@/test/FeatureTester";
 
 const Index = () => {
   const { toast } = useToast();
@@ -81,12 +82,13 @@ const Index = () => {
 
       <div className="container mx-auto py-6 px-4 md:px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-5 gap-2 bg-slate-800/50">
+          <TabsList className="grid grid-cols-6 gap-2 bg-slate-800/50">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="workflows">n8n Workflows</TabsTrigger>
             <TabsTrigger value="storage">Storage</TabsTrigger>
             <TabsTrigger value="knowledge">Knowledge Graph</TabsTrigger>
             <TabsTrigger value="console">Agent Console</TabsTrigger>
+            <TabsTrigger value="testing">System Tests</TabsTrigger>
           </TabsList>
           
           <TabsContent value="dashboard">
@@ -111,6 +113,10 @@ const Index = () => {
 
           <TabsContent value="console">
             <AgentConsole />
+          </TabsContent>
+
+          <TabsContent value="testing">
+            <FeatureTester />
           </TabsContent>
         </Tabs>
       </div>
