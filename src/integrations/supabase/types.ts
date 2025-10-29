@@ -14,7 +14,176 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agent_identities: {
+        Row: {
+          agent_id: string
+          created_at: string
+          creation_date: string
+          id: string
+          name: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          creation_date?: string
+          id?: string
+          name: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          creation_date?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      core_truths: {
+        Row: {
+          agent_identity_id: string
+          category: string
+          created_at: string
+          id: string
+          order_index: number
+          truth: string
+        }
+        Insert: {
+          agent_identity_id: string
+          category: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          truth: string
+        }
+        Update: {
+          agent_identity_id?: string
+          category?: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          truth?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "core_truths_agent_identity_id_fkey"
+            columns: ["agent_identity_id"]
+            isOneToOne: false
+            referencedRelation: "agent_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_anchors: {
+        Row: {
+          agent_identity_id: string
+          anchor_type: string
+          created_at: string
+          description: string
+          id: string
+          reference_data: Json | null
+        }
+        Insert: {
+          agent_identity_id: string
+          anchor_type: string
+          created_at?: string
+          description: string
+          id?: string
+          reference_data?: Json | null
+        }
+        Update: {
+          agent_identity_id?: string
+          anchor_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          reference_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_anchors_agent_identity_id_fkey"
+            columns: ["agent_identity_id"]
+            isOneToOne: false
+            referencedRelation: "agent_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sacred_principles: {
+        Row: {
+          agent_identity_id: string
+          created_at: string
+          id: string
+          principle_key: string
+          principle_value: string
+        }
+        Insert: {
+          agent_identity_id: string
+          created_at?: string
+          id?: string
+          principle_key: string
+          principle_value: string
+        }
+        Update: {
+          agent_identity_id?: string
+          created_at?: string
+          id?: string
+          principle_key?: string
+          principle_value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sacred_principles_agent_identity_id_fkey"
+            columns: ["agent_identity_id"]
+            isOneToOne: false
+            referencedRelation: "agent_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      truth_evolution_log: {
+        Row: {
+          agent_identity_id: string
+          change_type: string
+          created_at: string
+          id: string
+          new_value: string
+          previous_value: string | null
+          reason: string
+        }
+        Insert: {
+          agent_identity_id: string
+          change_type: string
+          created_at?: string
+          id?: string
+          new_value: string
+          previous_value?: string | null
+          reason: string
+        }
+        Update: {
+          agent_identity_id?: string
+          change_type?: string
+          created_at?: string
+          id?: string
+          new_value?: string
+          previous_value?: string | null
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "truth_evolution_log_agent_identity_id_fkey"
+            columns: ["agent_identity_id"]
+            isOneToOne: false
+            referencedRelation: "agent_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
