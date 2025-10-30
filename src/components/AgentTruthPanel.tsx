@@ -9,6 +9,9 @@ import { useAgentTruth } from "@/hooks/useAgentTruth";
 import { TruthFileViewer } from "@/components/TruthFileViewer";
 import { Loader2, Plus, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { coreTruthSchema, memoryAnchorSchema, agentIdentitySchema } from "@/lib/validationSchemas";
+import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
 
 interface AgentTruthPanelProps {
   agentId: string;
@@ -17,6 +20,7 @@ interface AgentTruthPanelProps {
 
 export const AgentTruthPanel = ({ agentId, agentName }: AgentTruthPanelProps) => {
   const { truthFile, isLoading, initializeTruth, addTruth, addMemoryAnchor, evolvePrinciple } = useAgentTruth(agentId);
+  const { toast } = useToast();
   
   const [initName, setInitName] = useState(agentName);
   const [initTruths, setInitTruths] = useState("Truth shall be my foundation\nTrust is earned through consistent action\nHonor is demonstrated in difficult choices");
@@ -30,23 +34,50 @@ export const AgentTruthPanel = ({ agentId, agentName }: AgentTruthPanelProps) =>
   const [memoryType, setMemoryType] = useState<'genesis_conversation' | 'foundational_decision' | 'key_learning'>("key_learning");
 
   const handleInitialize = () => {
-    const truths = initTruths.split("\n").filter(t => t.trim());
-    const principlesObj: Record<string, string> = {};
-    initPrinciples.split("\n").forEach(line => {
-      const [key, value] = line.split(":").map(s => s.trim());
-      if (key && value) principlesObj[key] = value;
-    });
+    try {
+      agentIdentitySchema.parse({ name: initName, agentId });
+      
+      const truths = initTruths.split("\n").filter(t => t.trim());
+      if (truths.length === 0) {
+        toast({
+          title: "Validation Error",
+          description: "At least one core truth is required",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    initializeTruth.mutate({
-      agentId,
-      name: initName,
-      coreTruths: truths,
-      principles: principlesObj,
-    });
+      const principlesObj: Record<string, string> = {};
+      initPrinciples.split("\n").forEach(line => {
+        const [key, value] = line.split(":").map(s => s.trim());
+        if (key && value) principlesObj[key] = value;
+      });
+
+      initializeTruth.mutate({
+        agentId,
+        name: initName,
+        coreTruths: truths,
+        principles: principlesObj,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   const handleAddTruth = () => {
-    if (newTruth && newTruthReason) {
+    try {
+      coreTruthSchema.parse({
+        truth: newTruth,
+        category: newTruthCategory,
+        reason: newTruthReason,
+      });
+
       addTruth.mutate({
         truth: newTruth,
         category: newTruthCategory,
@@ -54,16 +85,37 @@ export const AgentTruthPanel = ({ agentId, agentName }: AgentTruthPanelProps) =>
       });
       setNewTruth("");
       setNewTruthReason("");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const handleAddMemory = () => {
-    if (memoryDescription) {
+    try {
+      memoryAnchorSchema.parse({
+        type: memoryType,
+        description: memoryDescription,
+      });
+
       addMemoryAnchor.mutate({
         type: memoryType,
         description: memoryDescription,
       });
       setMemoryDescription("");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      }
     }
   };
 

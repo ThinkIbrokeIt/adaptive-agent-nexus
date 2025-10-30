@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Shield } from "lucide-react";
+import { Shield, LogOut, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
   systemLoad: number;
@@ -11,6 +12,7 @@ interface HeaderProps {
 
 const Header = ({ systemLoad, processingStage, runMcpWorkflow }: HeaderProps) => {
   const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
   
   return (
     <header className="border-b border-slate-700 bg-black/30 backdrop-blur-sm">
@@ -26,18 +28,40 @@ const Header = ({ systemLoad, processingStage, runMcpWorkflow }: HeaderProps) =>
             <Badge variant="outline" className="bg-slate-800">
               System Load: {systemLoad.toFixed(1)}%
             </Badge>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={() => navigate("/truths")}
-              className="gap-2"
-            >
-              <Shield className="h-4 w-4" />
-              Truth Files
-            </Button>
-            <Button size="sm" variant="outline" onClick={runMcpWorkflow} disabled={!!processingStage}>
-              {processingStage ? `Processing: ${processingStage}` : "Run McP Workflow"}
-            </Button>
+            {user && (
+              <>
+                {isAdmin && (
+                  <Badge variant="default" className="bg-primary">
+                    Admin
+                  </Badge>
+                )}
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => navigate("/truths")}
+                  className="gap-2"
+                >
+                  <Shield className="h-4 w-4" />
+                  Truth Files
+                </Button>
+                <Button size="sm" variant="outline" onClick={runMcpWorkflow} disabled={!!processingStage}>
+                  {processingStage ? `Processing: ${processingStage}` : "Run McP Workflow"}
+                </Button>
+                <span className="text-sm text-muted-foreground hidden md:inline">
+                  {user.email}
+                </span>
+                <Button size="sm" variant="outline" onClick={signOut} className="gap-2">
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </Button>
+              </>
+            )}
+            {!user && (
+              <Button size="sm" variant="outline" onClick={() => navigate("/auth")} className="gap-2">
+                <LogIn className="h-4 w-4" />
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       </div>
