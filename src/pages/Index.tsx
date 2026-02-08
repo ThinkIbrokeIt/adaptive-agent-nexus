@@ -29,6 +29,20 @@ const Index = () => {
   });
   const [feedbackEnabled, setFeedbackEnabled] = useState(true);
 
+  // Update trigger counts in real-time as processing stages change
+  useEffect(() => {
+    if (processingStage) {
+      console.log('Processing stage changed to:', processingStage);
+      if (processingStage === 'monitor') {
+        setTriggerCount(prev => ({ ...prev, monitor: prev.monitor + 1 }));
+      } else if (processingStage === 'contextualize') {
+        setTriggerCount(prev => ({ ...prev, contextualize: prev.contextualize + 1 }));
+      } else if (processingStage === 'personalize') {
+        setTriggerCount(prev => ({ ...prev, personalize: prev.personalize + 1 }));
+      }
+    }
+  }, [processingStage]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setSystemLoad(prev => {
@@ -73,40 +87,15 @@ const Index = () => {
       // Process the workflow - the processingStage will be updated automatically
       const result = await processMcpWorkflow(trigger);
 
-      // Update trigger counts based on the result
-      if (result.phase === 'monitor' && result.success) {
-        setTriggerCount(prev => ({ ...prev, monitor: prev.monitor + 1 }));
-        toast({
-          title: "Monitor Phase Complete",
-          description: `Captured trigger with ${result.confidence * 100}% confidence`
-        });
-      }
-
-      if (result.phase === 'contextualize' && result.success) {
-        setTriggerCount(prev => ({ ...prev, contextualize: prev.contextualize + 1 }));
-        toast({
-          title: "Contextualize Phase Complete",
-          description: "Context enriched with vector search and user patterns"
-        });
-      }
-
-      if (result.phase === 'personalize' && result.success) {
-        setTriggerCount(prev => ({ ...prev, personalize: prev.personalize + 1 }));
-        toast({
-          title: "Personalize Phase Complete",
-          description: `Generated adaptive response with ${result.confidence * 100}% confidence`
-        });
-
-        if (feedbackEnabled) {
-          // Simulate feedback phase
-          setTimeout(() => {
-            setTriggerCount(prev => ({ ...prev, feedback: prev.feedback + 1 }));
-            toast({
-              title: "Feedback Loop Complete",
-              description: "Agent knowledge updated based on response effectiveness"
-            });
-          }, 2000);
-        }
+      // Handle feedback phase after successful personalization
+      if (result.phase === 'personalize' && result.success && feedbackEnabled) {
+        setTimeout(() => {
+          setTriggerCount(prev => ({ ...prev, feedback: prev.feedback + 1 }));
+          toast({
+            title: "Feedback Loop Complete",
+            description: "Agent knowledge updated based on response effectiveness"
+          });
+        }, 2000);
       }
 
       // Log final result
