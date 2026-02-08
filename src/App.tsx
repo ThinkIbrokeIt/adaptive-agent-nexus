@@ -20,13 +20,16 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  // Set basename for GitHub Pages deployment
+  const basename = import.meta.env.PROD ? '/adaptive-agent-nexus' : '';
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AgentNetworkProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter basename={basename}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/truths" element={<AgentTruths />} />
