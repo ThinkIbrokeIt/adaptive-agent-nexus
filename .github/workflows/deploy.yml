@@ -39,6 +39,9 @@ jobs:
           VITE_OPENAI_API_KEY: ${{ secrets.VITE_OPENAI_API_KEY }}
           VITE_ANTHROPIC_API_KEY: ${{ secrets.VITE_ANTHROPIC_API_KEY }}
 
+      - name: Copy .nojekyll
+        run: cp .nojekyll dist/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
