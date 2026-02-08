@@ -141,15 +141,15 @@ const Index = () => {
 
       <div className="container mx-auto py-6 px-4 md:px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-8 gap-2 bg-slate-800/50">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="workflows">n8n Workflows</TabsTrigger>
-            <TabsTrigger value="storage">Storage</TabsTrigger>
-            <TabsTrigger value="knowledge">Knowledge Graph</TabsTrigger>
-            <TabsTrigger value="console">Agent Console</TabsTrigger>
-            <TabsTrigger value="llm">LLM Settings</TabsTrigger>
-            <TabsTrigger value="training">Local Training</TabsTrigger>
-            <TabsTrigger value="testing">System Tests</TabsTrigger>
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-1 md:gap-2 bg-slate-800/50 h-auto">
+            <TabsTrigger value="dashboard" className="text-xs md:text-sm">Dashboard</TabsTrigger>
+            <TabsTrigger value="workflows" className="text-xs md:text-sm">n8n Workflows</TabsTrigger>
+            <TabsTrigger value="storage" className="text-xs md:text-sm">Storage</TabsTrigger>
+            <TabsTrigger value="knowledge" className="text-xs md:text-sm">Knowledge Graph</TabsTrigger>
+            <TabsTrigger value="console" className="text-xs md:text-sm">Agent Console</TabsTrigger>
+            <TabsTrigger value="llm" className="text-xs md:text-sm">LLM Settings</TabsTrigger>
+            <TabsTrigger value="training" className="text-xs md:text-sm">Local Training</TabsTrigger>
+            <TabsTrigger value="testing" className="text-xs md:text-sm">System Tests</TabsTrigger>
           </TabsList>
           
           <TabsContent value="dashboard">
