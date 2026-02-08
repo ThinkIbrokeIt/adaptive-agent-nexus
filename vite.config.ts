@@ -18,6 +18,7 @@ export default defineConfig(async ({ mode }) => {
   }
 
   return {
+    base: process.env.NODE_ENV === 'production' ? '/adaptive-agent-nexus/' : '/',
     server: {
       host: "::",
       port: 8080,

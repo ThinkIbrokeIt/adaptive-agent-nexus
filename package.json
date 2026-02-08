@@ -27,6 +27,7 @@
     "deploy:vercel": "vercel --prod",
     "deploy:netlify": "netlify deploy --prod --dir dist",
     "deploy:preview": "vercel",
+    "deploy:github-pages": "NODE_ENV=production npm run build",
     "analyze-bundle": "npx vite-bundle-analyzer dist"
   },
   "dependencies": {
