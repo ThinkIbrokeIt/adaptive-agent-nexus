@@ -3,6 +3,7 @@ import SystemHealth from "@/components/SystemHealth";
 import McpTriggerCards from "@/components/McpTriggerCards";
 import RecentTriggers from "@/components/RecentTriggers";
 import WorkflowVisualizer from "@/components/WorkflowVisualizer";
+import { useSystemMetrics } from "@/hooks/useSystemMetrics";
 
 interface DashboardTabProps {
   triggerCount: {
@@ -22,6 +23,8 @@ const DashboardTab: React.FC<DashboardTabProps> = ({
   feedbackEnabled,
   onRunWorkflow
 }) => {
+  const systemMetrics = useSystemMetrics();
+
   return (
     <div className="space-y-4">
       <McpTriggerCards 
@@ -30,7 +33,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({
         feedbackEnabled={feedbackEnabled}
         onRunWorkflow={onRunWorkflow}
       />
-      <SystemHealth />
+      <SystemHealth {...systemMetrics} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <RecentTriggers />
         <WorkflowVisualizer processingStage={processingStage} />
