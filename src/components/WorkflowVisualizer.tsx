@@ -7,11 +7,13 @@ interface WorkflowVisualizerProps {
 }
 
 const WorkflowVisualizer: React.FC<WorkflowVisualizerProps> = ({ processingStage }) => {
-  const [currentStage, setCurrentStage] = useState<string | null>(processingStage || null);
-
+  const [renderKey, setRenderKey] = useState(0);
+  const [renderCount, setRenderCount] = useState(0);
+  
   useEffect(() => {
-    console.log('WorkflowVisualizer: processingStage changed to:', processingStage);
-    setCurrentStage(processingStage || null);
+    console.log('WorkflowVisualizer: processingStage changed to:', processingStage, 'at', new Date().toISOString());
+    setRenderKey(prev => prev + 1);
+    setRenderCount(prev => prev + 1);
   }, [processingStage]);
 
   const getNodeStyle = (stage: string) => {
@@ -62,20 +64,42 @@ const WorkflowVisualizer: React.FC<WorkflowVisualizerProps> = ({ processingStage
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card key={renderKey} className={`bg-slate-800/50 border-slate-700 transition-colors duration-300 ${processingStage ? 'bg-blue-900/20 border-blue-600' : ''}`}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           McP Workflow Visualization
-          {processingStage && (
+          <div className="flex items-center space-x-2">
             <span className="text-sm text-blue-400 capitalize">
-              {processingStage} active
+              {processingStage || 'Idle'}
             </span>
-          )}
+            <span className="text-xs text-slate-500">
+              (renders: {renderCount})
+            </span>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="relative min-h-[300px] flex items-center justify-center">
-          <svg width="100%" height="300" viewBox="0 0 600 300" className="overflow-visible">
+        {processingStage ? (
+          // Show a completely different visualization when processing
+          <div className="relative min-h-[300px] flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+            <div className="text-center text-white">
+              <div className="text-4xl font-bold mb-4">⚡ ACTIVE WORKFLOW ⚡</div>
+              <div className="text-xl">Phase: {processingStage.toUpperCase()}</div>
+              <div className="text-lg mt-4">Processing in progress...</div>
+              <div className="mt-8">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Show the normal SVG visualization when idle
+          <div className="relative min-h-[300px] flex items-center justify-center">
+            <svg 
+              width="100%" 
+              height="300" 
+              viewBox="0 0 600 300" 
+              className="overflow-visible"
+            >
             {/* Workflow paths */}
             <path 
               d="M100,150 C150,150 150,100 200,100 L380,100" 
@@ -161,6 +185,7 @@ const WorkflowVisualizer: React.FC<WorkflowVisualizerProps> = ({ processingStage
             Status: {processingStage ? `${processingStage} processing...` : 'Idle'}
           </div>
         </div>
+        )}
       </CardContent>
     </Card>
   );

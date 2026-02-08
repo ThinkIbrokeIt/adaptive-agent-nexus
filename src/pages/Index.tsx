@@ -41,12 +41,20 @@ const Index = () => {
   }, []);
 
   const runMcpWorkflow = async () => {
-    console.log('runMcpWorkflow called');
+    console.log('runMcpWorkflow called - testing visualization');
     toast({
       title: "Workflow Initiated",
-      description: "Starting real MCP trigger sequence..."
+      description: "Testing visualization updates..."
     });
 
+    // Test the visualization by manually setting processing stages
+    setTimeout(() => {
+      console.log('Setting to monitor');
+      // This won't work because processingStage is from context
+      // Let me use the context function instead
+    }, 1000);
+
+    // For now, just run the actual workflow
     // Create a sample MCP workflow trigger
     const trigger: McpWorkflowTrigger = {
       id: `trigger-${Date.now()}`,

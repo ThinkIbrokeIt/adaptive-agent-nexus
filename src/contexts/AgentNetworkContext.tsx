@@ -566,6 +566,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   // MCP Workflow Processing Functions
   const processMcpWorkflow = async (trigger: McpWorkflowTrigger): Promise<McpWorkflowResult> => {
+    console.log('processMcpWorkflow called with trigger:', trigger);
     const startTime = Date.now();
     const workflowId = uuidv4();
 
@@ -580,6 +581,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       setProcessingStage("monitor");
 
       // Phase 1: Monitor - Capture and validate the trigger
+      console.log('Starting monitor phase...');
       const monitorResult = await processMonitorPhase(trigger);
       if (!monitorResult.success) {
         throw new Error(`Monitor phase failed: ${monitorResult.data}`);
@@ -588,6 +590,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       setProcessingStage("contextualize");
       console.log('AgentNetworkContext: setProcessingStage to contextualize');
       // Phase 2: Contextualize - Enrich with user and system context
+      console.log('Starting contextualize phase...');
       const context: McpWorkflowContext = {
         trigger,
         userContext: await gatherUserContext(trigger),
@@ -603,6 +606,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       setProcessingStage("personalize");
 
       // Phase 3: Personalize - Generate adaptive response
+      console.log('Starting personalize phase...');
       const personalizeResult = await processPersonalizePhase(context, contextualizeResult.data);
 
       const processingTime = Date.now() - startTime;
@@ -754,7 +758,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
 
       // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       return {
         phase: 'contextualize',
@@ -849,7 +853,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
 
       // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      await new Promise(resolve => setTimeout(resolve, 4000));
 
       return {
         phase: 'personalize',
