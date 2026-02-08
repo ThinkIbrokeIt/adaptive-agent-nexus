@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Agent, AgentMessage } from "@/types/agent";
+import { Agent, AgentMessage, TrainingExample } from "@/types/agent";
 import { useAgentNetwork } from "@/contexts/AgentNetworkContext";
-import { Send, Brain, Search, Workflow, Database, Lightbulb, Settings, Zap } from "lucide-react";
+import { Send, Brain, Search, Workflow, Database, Lightbulb, Settings, Zap, MessageSquare } from "lucide-react";
 
 interface AgentChatProps {
   selectedAgent: Agent | null;
@@ -35,6 +35,60 @@ const AgentChat: React.FC<AgentChatProps> = ({ selectedAgent }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Function to find the best matching training example
+  const findBestTrainingMatch = (userInput: string, trainingData: TrainingExample[]): string => {
+    if (!trainingData || trainingData.length === 0) {
+      return "I don't have training data available for this query.";
+    }
+
+    const userInputLower = userInput.toLowerCase().trim();
+    let bestMatch: TrainingExample | null = null;
+    let bestScore = 0;
+
+    // Simple keyword matching algorithm
+    for (const example of trainingData) {
+      const inputLower = example.input.toLowerCase();
+      let score = 0;
+
+      // Exact match gets highest score
+      if (inputLower === userInputLower) {
+        return example.expectedOutput;
+      }
+
+      // Check for keyword matches
+      const userWords = userInputLower.split(/\s+/);
+      const exampleWords = inputLower.split(/\s+/);
+
+      for (const userWord of userWords) {
+        if (userWord.length > 2) { // Ignore very short words
+          for (const exampleWord of exampleWords) {
+            if (exampleWord.includes(userWord) || userWord.includes(exampleWord)) {
+              score += 1;
+            }
+          }
+        }
+      }
+
+      // Boost score for longer matches
+      if (score > 0) {
+        score += (userWords.length / exampleWords.length) * 0.5;
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = example;
+      }
+    }
+
+    // Return best match if score is above threshold, otherwise return a generic response
+    if (bestMatch && bestScore > 0.1) {
+      return bestMatch.expectedOutput;
+    } else {
+      // Fallback to a generic helpful response
+      return "I'm the Console Agent with comprehensive knowledge of the Adaptive Agent Nexus system. I can help you with: system features, agent console usage, dashboard navigation, McP workflows, multi-agent architecture, voice interface, agent spawning, and more. What specific aspect would you like to know about?";
+    }
+  };
 
   // Update messages when network messages change or selected agent changes
   useEffect(() => {
@@ -102,33 +156,44 @@ const AgentChat: React.FC<AgentChatProps> = ({ selectedAgent }) => {
 
       let response = "";
 
-      // Handle special commands
-      if (currentMessage === 'help' || currentMessage === '?') {
-        response = getAgentHelp(selectedAgent.type);
-      } else if (currentMessage === 'status') {
-        response = `Current status: ${selectedAgent.status}. I'm ${selectedAgent.isActive ? 'active' : 'inactive'} and capable of: ${selectedAgent.capabilities.join(', ')}.`;
-      } else if (currentMessage.startsWith('search ') && selectedAgent.type === 'research') {
-        response = `Searching for "${currentMessage.substring(7)}"... I would typically query multiple sources and provide comprehensive results.`;
-      } else if (currentMessage.includes('workflow') && selectedAgent.type === 'workflow') {
-        response = `Initiating McP workflow for "${currentMessage}". I'll monitor the context, process the request, and provide a personalized response.`;
-      } else if (currentMessage.includes('data') && selectedAgent.type === 'data') {
-        response = `Processing data query: "${currentMessage}". I'll analyze available datasets and provide insights.`;
-      } else if (currentMessage.includes('learn') && selectedAgent.type === 'learning') {
-        response = `Learning from "${currentMessage}". I'll update the knowledge base and improve future responses.`;
+      // Special handling for console agent - use training data
+      if (selectedAgent.id === 'console-agent' || selectedAgent.name.toLowerCase().includes('console')) {
+        // Console agent training data is stored in spawnedAgents
+        const consoleAgentData = network.spawnedAgents.find(agent => agent.id === 'console-agent' || agent.name.toLowerCase().includes('console'));
+        if (consoleAgentData && consoleAgentData.trainingData.length > 0) {
+          response = findBestTrainingMatch(inputMessage, consoleAgentData.trainingData);
+        } else {
+          response = "I'm the Console Agent, but I don't have training data loaded yet. Please check the system configuration.";
+        }
       } else {
-        // Default agent-specific responses
-        switch (selectedAgent.type) {
-          case 'primary':
-            response = `Hello! I'm the Primary Agent. I coordinate the entire agent network and can spawn specialized agents for specific tasks. You said: "${inputMessage}". I can help you spawn a new agent, manage existing ones, or coordinate complex workflows.`;
-            break;
-          case 'adaptive':
-            response = `I'm the Adaptive Subagent, a flexible AI assistant that can be configured for various tasks. I adapt to your needs and learn from interactions. For "${inputMessage}", I'll analyze this and provide the most helpful response based on my current configuration.`;
-            break;
-          case 'spawned':
-            response = `I'm a specialized spawned agent focused on ${selectedAgent.capabilities.join(' and ')}. I've been trained for specific tasks and can provide expert assistance in my domain. Regarding "${inputMessage}", I'll apply my specialized knowledge to help you.`;
-            break;
-          default:
-            response = `I received your message: "${inputMessage}". I'm here to help!`;
+        // Handle special commands
+        if (currentMessage === 'help' || currentMessage === '?') {
+          response = getAgentHelp(selectedAgent.type);
+        } else if (currentMessage === 'status') {
+          response = `Current status: ${selectedAgent.status}. I'm ${selectedAgent.isActive ? 'active' : 'inactive'} and capable of: ${selectedAgent.capabilities.join(', ')}.`;
+        } else if (currentMessage.startsWith('search ') && selectedAgent.type === 'research') {
+          response = `Searching for "${currentMessage.substring(7)}"... I would typically query multiple sources and provide comprehensive results.`;
+        } else if (currentMessage.includes('workflow') && selectedAgent.type === 'workflow') {
+          response = `Initiating McP workflow for "${currentMessage}". I'll monitor the context, process the request, and provide a personalized response.`;
+        } else if (currentMessage.includes('data') && selectedAgent.type === 'data') {
+          response = `Processing data query: "${currentMessage}". I'll analyze available datasets and provide insights.`;
+        } else if (currentMessage.includes('learn') && selectedAgent.type === 'learning') {
+          response = `Learning from "${currentMessage}". I'll update the knowledge base and improve future responses.`;
+        } else {
+          // Default agent-specific responses
+          switch (selectedAgent.type) {
+            case 'primary':
+              response = `Hello! I'm the Primary Agent. I coordinate the entire agent network and can spawn specialized agents for specific tasks. You said: "${inputMessage}". I can help you spawn a new agent, manage existing ones, or coordinate complex workflows.`;
+              break;
+            case 'adaptive':
+              response = `I'm the Adaptive Subagent, a flexible AI assistant that can be configured for various tasks. I adapt to your needs and learn from interactions. For "${inputMessage}", I'll analyze this and provide the most helpful response based on my current configuration.`;
+              break;
+            case 'spawned':
+              response = `I'm a specialized spawned agent focused on ${selectedAgent.capabilities.join(' and ')}. I've been trained for specific tasks and can provide expert assistance in my domain. Regarding "${inputMessage}", I'll apply my specialized knowledge to help you.`;
+              break;
+            default:
+              response = `I received your message: "${inputMessage}". I'm here to help!`;
+          }
         }
       }
 

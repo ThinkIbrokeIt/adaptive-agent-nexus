@@ -15,6 +15,14 @@ const initialAgents: Agent[] = [
     isActive: true,
   },
   {
+    id: "console-agent",
+    name: "Console Agent",
+    type: "adaptive",
+    status: "idle",
+    capabilities: ["conversation", "guidance", "system-knowledge"],
+    isActive: true,
+  },
+  {
     id: "adaptive-subagent",
     name: "Adaptive Subagent",
     type: "adaptive",
@@ -36,12 +44,176 @@ const initialAgentNetwork: AgentNetwork = {
   agents: initialAgents,
   activeAgents: initialAgents.filter(agent => agent.isActive).map(agent => agent.id),
   messages: [],
-  spawnedAgents: [],
+  spawnedAgents: [
+    {
+      id: "console-agent",
+      name: "Console Agent",
+      baseAgentId: "primary-agent",
+      specialization: "system guidance and feature explanation",
+      trainingData: [
+        {
+          input: "What can you help me with?",
+          expectedOutput: "I can help you with all features of the Adaptive Agent Nexus system! I know about: 1) Agent Console commands (help, status, clear, search, workflow), 2) Multi-agent architecture (5 specialized agents), 3) Voice interface (speech recognition & synthesis), 4) McP Workflow System (Monitor→Contextualize→Personalize), 5) Dashboard tabs (Dashboard, n8n Workflows, Storage, Knowledge Graph, Agent Console, LLM Settings, Local Training, System Tests), 6) Agent spawning and training, 7) Real-time monitoring and performance metrics. What would you like to explore?",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "I can help you with all features of the Adaptive Agent Nexus system! I know about: 1) Agent Console commands (help, status, clear, search, workflow), 2) Multi-agent architecture (5 specialized agents), 3) Voice interface (speech recognition & synthesis), 4) McP Workflow System (Monitor→Contextualize→Personalize), 5) Dashboard tabs (Dashboard, n8n Workflows, Storage, Knowledge Graph, Agent Console, LLM Settings, Local Training, System Tests), 6) Agent spawning and training, 7) Real-time monitoring and performance metrics. What would you like to explore?"
+        },
+        {
+          input: "How do I use the agent console?",
+          expectedOutput: "The Agent Console has three main sections: 1) Console tab - for text commands and logs, 2) Direct Chat tab - for chatting with individual agents, 3) Agent Status tab - for monitoring agent health. Available commands: 'help' (show all commands), 'status' (system info), 'clear' (clear logs), 'search [query]' (web search), 'workflow run' (execute McP workflow). You can also spawn new specialized agents using the 'Spawn' button.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "The Agent Console has three main sections: 1) Console tab - for text commands and logs, 2) Direct Chat tab - for chatting with individual agents, 3) Agent Status tab - for monitoring agent health. Available commands: 'help' (show all commands), 'status' (system info), 'clear' (clear logs), 'search [query]' (web search), 'workflow run' (execute McP workflow). You can also spawn new specialized agents using the 'Spawn' button."
+        },
+        {
+          input: "What are the dashboard tabs?",
+          expectedOutput: "The dashboard has 8 main tabs: 1) Dashboard - system overview, trigger cards, recent activity, 2) n8n Workflows - manage and execute automation workflows, 3) Storage - data management and configuration, 4) Knowledge Graph - visual agent relationships and data flow, 5) Agent Console - command interface and agent management, 6) LLM Settings - language model configuration, 7) Local Training - model training and fine-tuning, 8) System Tests - automated feature verification. Each tab serves a specific purpose in managing the multi-agent system.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "The dashboard has 8 main tabs: 1) Dashboard - system overview, trigger cards, recent activity, 2) n8n Workflows - manage and execute automation workflows, 3) Storage - data management and configuration, 4) Knowledge Graph - visual agent relationships and data flow, 5) Agent Console - command interface and agent management, 6) LLM Settings - language model configuration, 7) Local Training - model training and fine-tuning, 8) System Tests - automated feature verification. Each tab serves a specific purpose in managing the multi-agent system."
+        },
+        {
+          input: "How does the McP workflow system work?",
+          expectedOutput: "McP stands for Monitor→Contextualize→Personalize. It's our 3-phase workflow system: 1) Monitor - captures and validates input triggers (user actions, system events, data changes), 2) Contextualize - enriches data with semantic search and user context, 3) Personalize - generates tailored responses using LLM. Workflows run automatically and you can see real-time progress in the Dashboard tab. The system continuously learns from feedback to improve responses.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "McP stands for Monitor→Contextualize→Personalize. It's our 3-phase workflow system: 1) Monitor - captures and validates input triggers (user actions, system events, data changes), 2) Contextualize - enriches data with semantic search and user context, 3) Personalize - generates tailored responses using LLM. Workflows run automatically and you can see real-time progress in the Dashboard tab. The system continuously learns from feedback to improve responses."
+        },
+        {
+          input: "Tell me about the multi-agent architecture",
+          expectedOutput: "We have 5 specialized agents working together: 1) Primary Agent - main coordinator and conversational interface, 2) Research Agent - web searches and information gathering, 3) Workflow Agent - McP workflow execution and automation, 4) Data Agent - database queries and data analysis, 5) Learning Agent - continuous improvement and knowledge acquisition. Agents communicate via message passing and tasks are automatically delegated based on capabilities. You can spawn additional specialized agents for specific tasks.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "We have 5 specialized agents working together: 1) Primary Agent - main coordinator and conversational interface, 2) Research Agent - web searches and information gathering, 3) Workflow Agent - McP workflow execution and automation, 4) Data Agent - database queries and data analysis, 5) Learning Agent - continuous improvement and knowledge acquisition. Agents communicate via message passing and tasks are automatically delegated based on capabilities. You can spawn additional specialized agents for specific tasks."
+        },
+        {
+          input: "How do I spawn a new agent?",
+          expectedOutput: "To spawn a new agent: 1) Go to Agent Console → Direct Chat tab, 2) Click the 'Spawn' button next to 'Select Agent', 3) Fill in: Agent Name (e.g., 'Code Review Agent'), Specialization (e.g., 'code analysis'), Capabilities (comma-separated like 'analysis,communication'), and optional Initial Training Data, 4) Click spawn. The new agent will appear in the spawned agents list with an export button. You can then chat with it directly or use it in workflows.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "To spawn a new agent: 1) Go to Agent Console → Direct Chat tab, 2) Click the 'Spawn' button next to 'Select Agent', 3) Fill in: Agent Name (e.g., 'Code Review Agent'), Specialization (e.g., 'code analysis'), Capabilities (comma-separated like 'analysis,communication'), and optional Initial Training Data, 4) Click spawn. The new agent will appear in the spawned agents list with an export button. You can then chat with it directly or use it in workflows."
+        },
+        {
+          input: "What is the voice interface?",
+          expectedOutput: "The voice interface provides speech recognition and text-to-speech: 1) Speech Recognition - click the microphone icon in the command input to speak commands instead of typing, 2) Text-to-Speech - the system can read responses aloud (toggle with voice controls), 3) Voice Commands - you can say 'help', 'status', 'search for [topic]', 'run workflow', etc. The system works with modern browsers and provides visual feedback during speech recognition.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "The voice interface provides speech recognition and text-to-speech: 1) Speech Recognition - click the microphone icon in the command input to speak commands instead of typing, 2) Text-to-Speech - the system can read responses aloud (toggle with voice controls), 3) Voice Commands - you can say 'help', 'status', 'search for [topic]', 'run workflow', etc. The system works with modern browsers and provides visual feedback during speech recognition."
+        },
+        {
+          input: "How do I export trained agents?",
+          expectedOutput: "To export a trained agent: 1) Go to Agent Console → Direct Chat tab, 2) Find the agent in the 'Spawned Agents' section, 3) Click the download icon (⬇️) next to the agent name, 4) The agent will be saved as a JSON file containing all training data, performance metrics, and metadata. You can later import this agent into other systems or share it with others. The filename includes the agent name and export date.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "To export a trained agent: 1) Go to Agent Console → Direct Chat tab, 2) Find the agent in the 'Spawned Agents' section, 3) Click the download icon (⬇️) next to the agent name, 4) The agent will be saved as a JSON file containing all training data, performance metrics, and metadata. You can later import this agent into other systems or share it with others. The filename includes the agent name and export date."
+        },
+        {
+          input: "What is the Knowledge Graph?",
+          expectedOutput: "The Knowledge Graph is an interactive visualization showing: 1) Agent relationships and communication patterns, 2) Data flow between system components, 3) Real-time status updates (drag nodes, click for details), 4) Export options (JSON, SVG, CSV, PNG formats), 5) Filtering and search capabilities. It helps you understand how agents work together and monitor system activity. You can export the graph data for analysis or documentation.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "The Knowledge Graph is an interactive visualization showing: 1) Agent relationships and communication patterns, 2) Data flow between system components, 3) Real-time status updates (drag nodes, click for details), 4) Export options (JSON, SVG, CSV, PNG formats), 5) Filtering and search capabilities. It helps you understand how agents work together and monitor system activity. You can export the graph data for analysis or documentation."
+        },
+        {
+          input: "How do I configure storage?",
+          expectedOutput: "Storage configuration is in the Storage tab: 1) Choose provider (DuckDB, ChromaDB, SQLite, MinIO), 2) Configure connection settings (host, port, credentials), 3) Set up data schemas and indexes, 4) Test connections with the 'Test Connection' button, 5) Save configuration. The system supports multiple storage backends for different data types - vector databases for embeddings, relational databases for structured data, and object storage for files.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "Storage configuration is in the Storage tab: 1) Choose provider (DuckDB, ChromaDB, SQLite, MinIO), 2) Configure connection settings (host, port, credentials), 3) Set up data schemas and indexes, 4) Test connections with the 'Test Connection' button, 5) Save configuration. The system supports multiple storage backends for different data types - vector databases for embeddings, relational databases for structured data, and object storage for files."
+        },
+        {
+          input: "What are system tests?",
+          expectedOutput: "System Tests provide automated feature verification: 1) Run comprehensive tests to ensure all features work, 2) Check agent communication and task delegation, 3) Verify workflow execution and data processing, 4) Monitor performance metrics and system health, 5) Generate detailed test reports. Tests run automatically and help maintain system reliability. You can see test results in real-time and get notifications about any issues.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "System Tests provide automated feature verification: 1) Run comprehensive tests to ensure all features work, 2) Check agent communication and task delegation, 3) Verify workflow execution and data processing, 4) Monitor performance metrics and system health, 5) Generate detailed test reports. Tests run automatically and help maintain system reliability. You can see test results in real-time and get notifications about any issues."
+        },
+        {
+          input: "How do I configure the LLM?",
+          expectedOutput: "LLM configuration is in the LLM Settings tab: 1) Select provider (OpenAI, Anthropic, local models), 2) Enter API keys and endpoints, 3) Configure model parameters (temperature, max tokens, etc.), 4) Set up model routing and fallbacks, 5) Test the configuration. The system supports multiple LLM providers and can route requests based on task complexity. Local models can be configured for privacy or offline use.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "LLM configuration is in the LLM Settings tab: 1) Select provider (OpenAI, Anthropic, local models), 2) Enter API keys and endpoints, 3) Configure model parameters (temperature, max tokens, etc.), 4) Set up model routing and fallbacks, 5) Test the configuration. The system supports multiple LLM providers and can route requests based on task complexity. Local models can be configured for privacy or offline use."
+        },
+        {
+          input: "What is local training?",
+          expectedOutput: "Local Training allows you to fine-tune models: 1) Upload training datasets (JSONL, CSV, text formats), 2) Configure training parameters (epochs, batch size, learning rate), 3) Monitor training progress in real-time, 4) Evaluate model performance, 5) Deploy trained models. You can create specialized agents by training on domain-specific data. The system supports incremental training and model versioning.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "Local Training allows you to fine-tune models: 1) Upload training datasets (JSONL, CSV, text formats), 2) Configure training parameters (epochs, batch size, learning rate), 3) Monitor training progress in real-time, 4) Evaluate model performance, 5) Deploy trained models. You can create specialized agents by training on domain-specific data. The system supports incremental training and model versioning."
+        },
+        {
+          input: "How do I run a workflow?",
+          expectedOutput: "To run a workflow: 1) Go to Dashboard tab and click 'Run MCP Workflow' button, 2) Or use the command 'workflow run' in Agent Console, 3) Watch the 3-phase progress (Monitor→Contextualize→Personalize), 4) See real-time updates in trigger cards, 5) View results in Recent Triggers. Workflows process user inputs, system events, or data changes automatically. You can also manage n8n workflows in the n8n Workflows tab for more complex automation.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "To run a workflow: 1) Go to Dashboard tab and click 'Run MCP Workflow' button, 2) Or use the command 'workflow run' in Agent Console, 3) Watch the 3-phase progress (Monitor→Contextualize→Personalize), 4) See real-time updates in trigger cards, 5) View results in Recent Triggers. Workflows process user inputs, system events, or data changes automatically. You can also manage n8n workflows in the n8n Workflows tab for more complex automation."
+        },
+        {
+          input: "What commands are available?",
+          expectedOutput: "Available commands: 'help' (show commands), 'status' (system info), 'clear' (clear logs), 'search [query]' (web search), 'workflow run' (execute McP workflow), 'tell me about [topic]' (conversational queries), 'feedback [message]' (provide feedback), 'voice on/off' (toggle voice), 'query [question]' (ask questions). Commands are processed by the appropriate specialized agent automatically.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "Available commands: 'help' (show commands), 'status' (system info), 'clear' (clear logs), 'search [query]' (web search), 'workflow run' (execute McP workflow), 'tell me about [topic]' (conversational queries), 'feedback [message]' (provide feedback), 'voice on/off' (toggle voice), 'query [question]' (ask questions). Commands are processed by the appropriate specialized agent automatically."
+        },
+        {
+          input: "How do I get started?",
+          expectedOutput: "Welcome to Adaptive Agent Nexus! Here's how to get started: 1) Explore the Dashboard tab to see system overview, 2) Try the 'help' command in Agent Console to see available commands, 3) Click 'Run MCP Workflow' to see the 3-phase system in action, 4) Visit Knowledge Graph to understand agent relationships, 5) Try spawning a new agent in Agent Console → Direct Chat, 6) Use voice commands by clicking the microphone icon. The system is fully functional out of the box with comprehensive training!",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "Welcome to Adaptive Agent Nexus! Here's how to get started: 1) Explore the Dashboard tab to see system overview, 2) Try the 'help' command in Agent Console to see available commands, 3) Click 'Run MCP Workflow' to see the 3-phase system in action, 4) Visit Knowledge Graph to understand agent relationships, 5) Try spawning a new agent in Agent Console → Direct Chat, 6) Use voice commands by clicking the microphone icon. The system is fully functional out of the box with comprehensive training!"
+        }
+      ],
+      capabilities: ["conversation", "coordination", "guidance", "system-knowledge"],
+      performance: {
+        accuracy: 0.95,
+        responseTime: 800,
+        successRate: 0.98,
+        totalInteractions: 150,
+      },
+      createdAt: "2024-01-01T00:00:00Z",
+      lastTrained: new Date().toISOString(),
+      isExported: false,
+    },
+    {
+      id: "test-agent-1",
+      name: "Test Research Agent",
+      baseAgentId: "adaptive-subagent",
+      specialization: "research and analysis",
+      trainingData: [
+        {
+          input: "What is machine learning?",
+          expectedOutput: "Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed."
+        },
+        {
+          input: "Explain neural networks",
+          expectedOutput: "Neural networks are computing systems inspired by biological neural networks that can learn to perform tasks by considering examples.",
+          feedback: "positive",
+          timestamp: new Date().toISOString(),
+          actualOutput: "Neural networks are computing systems inspired by biological neural networks that can learn to perform tasks by considering examples."
+        }
+      ],
+      capabilities: ["research", "analysis", "communication"],
+      performance: {
+        accuracy: 0.85,
+        responseTime: 1200,
+        successRate: 0.92,
+        totalInteractions: 25,
+      },
+      createdAt: "2024-01-15T10:30:00Z",
+      lastTrained: "2024-01-20T14:45:00Z",
+      isExported: false,
+    }
+  ],
   recentTriggers: [],
 };
 
 interface AgentNetworkContextType {
   network: AgentNetwork;
+  processingStage: string | null;
   sendAgentMessage: (message: Omit<AgentMessage, "timestamp">) => void;
   createAgentTask: (task: Omit<AgentTask, "id" | "timestamp" | "status">) => AgentTask;
   updateAgentStatus: (agentId: string, status: AgentStatus) => void;
@@ -67,6 +239,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
     completedWorkflows: 0,
     failedWorkflows: 0
   });
+  const [processingStage, setProcessingStage] = useState<string | null>(null);
   const [activeWorkflows, setActiveWorkflows] = useState<Map<string, McpWorkflowContext>>(new Map());
 
   useEffect(() => {
@@ -403,6 +576,8 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       // Update workflow agent status
       updateAgentStatus("workflow-agent", "processing");
       setWorkflowStats(prev => ({ ...prev, activeWorkflows: prev.activeWorkflows + 1 }));
+      console.log('Setting processingStage to monitor');
+      setProcessingStage("monitor");
 
       // Phase 1: Monitor - Capture and validate the trigger
       const monitorResult = await processMonitorPhase(trigger);
@@ -410,6 +585,8 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
         throw new Error(`Monitor phase failed: ${monitorResult.data}`);
       }
 
+      setProcessingStage("contextualize");
+      console.log('AgentNetworkContext: setProcessingStage to contextualize');
       // Phase 2: Contextualize - Enrich with user and system context
       const context: McpWorkflowContext = {
         trigger,
@@ -421,6 +598,9 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (!contextualizeResult.success) {
         throw new Error(`Contextualize phase failed: ${contextualizeResult.data}`);
       }
+
+      console.log('AgentNetworkContext: setProcessingStage to personalize');
+      setProcessingStage("personalize");
 
       // Phase 3: Personalize - Generate adaptive response
       const personalizeResult = await processPersonalizePhase(context, contextualizeResult.data);
@@ -437,6 +617,8 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       // Update workflow agent status
       updateAgentStatus("workflow-agent", personalizeResult.success ? "success" : "error");
+      setProcessingStage(null);
+      console.log('AgentNetworkContext: setProcessingStage to null (success)');
 
       return {
         ...personalizeResult,
@@ -452,7 +634,9 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
         failedWorkflows: prev.failedWorkflows + 1
       }));
 
+      console.log('AgentNetworkContext: setProcessingStage to null (error)');
       updateAgentStatus("workflow-agent", "error");
+      setProcessingStage(null);
 
       return {
         phase: 'monitor',
@@ -491,7 +675,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
 
       // Simulate data validation and initial processing
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       return {
         phase: 'monitor',
@@ -570,7 +754,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
 
       // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
       return {
         phase: 'contextualize',
@@ -665,7 +849,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
 
       // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 250));
+      await new Promise(resolve => setTimeout(resolve, 1200));
 
       return {
         phase: 'personalize',
@@ -722,6 +906,7 @@ export const AgentNetworkProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const contextValue = {
     network,
+    processingStage,
     sendAgentMessage,
     createAgentTask,
     updateAgentStatus,

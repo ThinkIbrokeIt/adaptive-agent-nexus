@@ -7,10 +7,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CircleArrowUp, MessageSquare, Users, Settings, Brain, Search, Workflow, Database, Lightbulb, Zap } from "lucide-react";
+import { CircleArrowUp, MessageSquare, Users, Settings, Brain, Search, Workflow, Database, Lightbulb, Zap, Download } from "lucide-react";
 import { LogEntry, Agent } from "@/types/agent";
 import { useAgentNetwork } from "@/contexts/AgentNetworkContext";
 import { useAgentCommands } from "@/hooks/useAgentCommands";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import ConsoleLog from "./agent-console/ConsoleLog";
 import CommandInput from "./agent-console/CommandInput";
@@ -52,6 +53,7 @@ const initialLogs: LogEntry[] = [
 
 const AgentConsole = () => {
   const agentNetwork = useAgentNetwork();
+  const { toast } = useToast();
   const {
     logs,
     isListening,
@@ -71,6 +73,36 @@ const AgentConsole = () => {
     capabilities: '',
     initialTraining: ''
   });
+
+  const handleExportAgent = async (agentId: string) => {
+    try {
+      const agentExport = await agentNetwork.exportAgent(agentId);
+      
+      // Create a downloadable JSON file
+      const dataStr = JSON.stringify(agentExport, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `agent-${agentExport.agent.name.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      toast({
+        title: "Agent Exported Successfully",
+        description: `Exported "${agentExport.agent.name}" with ${agentExport.trainingData.length} training examples`,
+      });
+      
+    } catch (error) {
+      console.error('Failed to export agent:', error);
+      toast({
+        title: "Export Failed",
+        description: error instanceof Error ? error.message : 'Unknown error occurred',
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-4">
@@ -164,27 +196,37 @@ const AgentConsole = () => {
                           <div className="border-t border-slate-600 my-4"></div>
                           <h4 className="text-sm font-medium text-slate-400 mb-2">Spawned Agents</h4>
                           {agentNetwork.network.spawnedAgents.map((agent) => (
-                            <Button
-                              key={agent.id}
-                              variant={selectedAgent?.id === agent.id ? "default" : "outline"}
-                              className="w-full justify-start"
-                              onClick={() => setSelectedAgent({
-                                id: agent.id,
-                                name: agent.name,
-                                type: "spawned" as any,
-                                status: "idle",
-                                capabilities: agent.capabilities,
-                                isActive: true,
-                              })}
-                            >
-                              <div className="flex items-center space-x-2">
-                                <Zap className="h-4 w-4" />
-                                <span>{agent.name}</span>
-                                <Badge variant="secondary" className="text-xs">
-                                  {agent.specialization}
-                                </Badge>
-                              </div>
-                            </Button>
+                            <div key={agent.id} className="flex items-center space-x-2 mb-2">
+                              <Button
+                                variant={selectedAgent?.id === agent.id ? "default" : "outline"}
+                                className="flex-1 justify-start"
+                                onClick={() => setSelectedAgent({
+                                  id: agent.id,
+                                  name: agent.name,
+                                  type: "spawned" as any,
+                                  status: "idle",
+                                  capabilities: agent.capabilities,
+                                  isActive: true,
+                                })}
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <Zap className="h-4 w-4" />
+                                  <span>{agent.name}</span>
+                                  <Badge variant="secondary" className="text-xs">
+                                    {agent.specialization}
+                                  </Badge>
+                                </div>
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleExportAgent(agent.id)}
+                                className="px-2"
+                                title="Export trained agent"
+                              >
+                                <Download className="h-3 w-3" />
+                              </Button>
+                            </div>
                           ))}
                         </>
                       )}

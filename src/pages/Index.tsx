@@ -18,10 +18,9 @@ import { McpWorkflowTrigger } from "@/types/agent";
 
 const Index = () => {
   const { toast } = useToast();
-  const { processMcpWorkflow, getWorkflowStatus } = useAgentNetwork();
+  const { processMcpWorkflow, getWorkflowStatus, processingStage } = useAgentNetwork();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [systemLoad, setSystemLoad] = useState(28);
-  const [processingStage, setProcessingStage] = useState<string | null>(null);
   const [triggerCount, setTriggerCount] = useState({
     monitor: 152,
     contextualize: 147,
@@ -42,6 +41,7 @@ const Index = () => {
   }, []);
 
   const runMcpWorkflow = async () => {
+    console.log('runMcpWorkflow called');
     toast({
       title: "Workflow Initiated",
       description: "Starting real MCP trigger sequence..."
@@ -62,59 +62,43 @@ const Index = () => {
     };
 
     try {
-      // Set initial processing stage
-      setProcessingStage("monitor");
-
-      // Process the workflow
+      // Process the workflow - the processingStage will be updated automatically
       const result = await processMcpWorkflow(trigger);
 
-      // Update UI based on workflow progress
+      // Update trigger counts based on the result
       if (result.phase === 'monitor' && result.success) {
         setTriggerCount(prev => ({ ...prev, monitor: prev.monitor + 1 }));
         toast({
           title: "Monitor Phase Complete",
           description: `Captured trigger with ${result.confidence * 100}% confidence`
         });
-
-        setProcessingStage("contextualize");
       }
 
-      if (result.nextPhase === 'contextualize') {
-        // Wait a bit for contextualize phase
-        setTimeout(() => {
-          setTriggerCount(prev => ({ ...prev, contextualize: prev.contextualize + 1 }));
-          toast({
-            title: "Contextualize Phase Complete",
-            description: "Context enriched with vector search and user patterns"
-          });
-
-          setProcessingStage("personalize");
-        }, 1000);
+      if (result.phase === 'contextualize' && result.success) {
+        setTriggerCount(prev => ({ ...prev, contextualize: prev.contextualize + 1 }));
+        toast({
+          title: "Contextualize Phase Complete",
+          description: "Context enriched with vector search and user patterns"
+        });
       }
 
-      if (result.nextPhase === 'personalize') {
-        // Wait a bit for personalize phase
-        setTimeout(() => {
-          setTriggerCount(prev => ({ ...prev, personalize: prev.personalize + 1 }));
-          toast({
-            title: "Personalize Phase Complete",
-            description: `Generated adaptive response with ${result.confidence * 100}% confidence`
-          });
+      if (result.phase === 'personalize' && result.success) {
+        setTriggerCount(prev => ({ ...prev, personalize: prev.personalize + 1 }));
+        toast({
+          title: "Personalize Phase Complete",
+          description: `Generated adaptive response with ${result.confidence * 100}% confidence`
+        });
 
-          if (feedbackEnabled) {
-            setProcessingStage("feedback");
-            setTimeout(() => {
-              setTriggerCount(prev => ({ ...prev, feedback: prev.feedback + 1 }));
-              toast({
-                title: "Feedback Loop Complete",
-                description: "Agent knowledge updated based on response effectiveness"
-              });
-              setProcessingStage(null);
-            }, 2000);
-          } else {
-            setProcessingStage(null);
-          }
-        }, 2000);
+        if (feedbackEnabled) {
+          // Simulate feedback phase
+          setTimeout(() => {
+            setTriggerCount(prev => ({ ...prev, feedback: prev.feedback + 1 }));
+            toast({
+              title: "Feedback Loop Complete",
+              description: "Agent knowledge updated based on response effectiveness"
+            });
+          }, 2000);
+        }
       }
 
       // Log final result
@@ -127,7 +111,6 @@ const Index = () => {
         description: error instanceof Error ? error.message : "Unknown workflow error",
         variant: "destructive"
       });
-      setProcessingStage(null);
     }
   };
 
