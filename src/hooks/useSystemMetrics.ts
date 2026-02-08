@@ -27,7 +27,8 @@ export const useSystemMetrics = () => {
     llmServiceStatus: 'ready'
   });
 
-  // Simulate CPU usage fluctuations
+  // Simulate CPU usage fluctuations - intentionally runs once with interval cleanup
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const cpuInterval = setInterval(() => {
       setMetrics(prev => ({
@@ -39,7 +40,8 @@ export const useSystemMetrics = () => {
     return () => clearInterval(cpuInterval);
   }, []);
 
-  // Simulate memory usage fluctuations
+  // Simulate memory usage fluctuations - intentionally runs once with interval cleanup
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const memoryInterval = setInterval(() => {
       setMetrics(prev => {
@@ -55,7 +57,8 @@ export const useSystemMetrics = () => {
     return () => clearInterval(memoryInterval);
   }, []);
 
-  // Simulate storage usage gradual increase
+  // Simulate storage usage gradual increase - intentionally runs once
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const storageInterval = setInterval(() => {
       setMetrics(prev => ({
@@ -67,7 +70,8 @@ export const useSystemMetrics = () => {
     return () => clearInterval(storageInterval);
   }, []);
 
-  // Monitor API latency by making test requests
+  // Monitor API latency by making test requests - intentionally runs once
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const latencyInterval = setInterval(async () => {
       const startTime = performance.now();
@@ -98,7 +102,8 @@ export const useSystemMetrics = () => {
     return () => clearInterval(latencyInterval);
   }, []);
 
-  // Simulate service status changes
+  // Simulate service status changes - intentionally runs once
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const serviceInterval = setInterval(() => {
       setMetrics(prev => ({

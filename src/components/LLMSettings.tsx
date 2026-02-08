@@ -27,6 +27,8 @@ export const LLMSettings = () => {
   const [temperature, setTemperature] = useState<number>(0.7);
   const [maxTokens, setMaxTokens] = useState<number>(2000);
 
+  // Load configuration on mount - intentionally runs once
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const loadConfig = () => {
       const currentConfig = llmConfigManager.getConfig();

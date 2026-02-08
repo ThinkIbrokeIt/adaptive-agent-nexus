@@ -43,6 +43,8 @@ const Index = () => {
     }
   }, [processingStage]);
 
+  // System metrics polling - intentionally runs once with interval cleanup
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const interval = setInterval(() => {
       setSystemLoad(prev => {

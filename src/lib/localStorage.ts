@@ -41,19 +41,19 @@ export class LocalStorageDatabase {
 
   static getAgentIdentity(agentId: string): AgentIdentity | null {
     const identities = this.getAgentIdentities();
-    return identities.find(identity => identity.agent_id === agentId) || null;
+    return identities.find(identity => identity.agentId === agentId) || null;
   }
 
   static createAgentIdentity(agentId: string, name: string): AgentIdentity {
     const identities = this.getAgentIdentities();
     const newIdentity: AgentIdentity = {
       id: generateId(),
-      agent_id: agentId,
+      agentId,
       name,
       version: '1.0',
-      creation_date: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      creationDate: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     identities.push(newIdentity);
@@ -64,20 +64,20 @@ export class LocalStorageDatabase {
   // Core Truths
   static getCoreTruths(agentIdentityId: string): CoreTruth[] {
     const truths = getFromStorage<CoreTruth>(STORAGE_KEYS.CORE_TRUTHS);
-    return truths.filter(truth => truth.agent_identity_id === agentIdentityId);
+    return truths.filter(truth => truth.agentIdentityId === agentIdentityId);
   }
 
   static addCoreTruth(agentIdentityId: string, truth: string, category: 'foundation' | 'principle' | 'covenant'): CoreTruth {
     const truths = getFromStorage<CoreTruth>(STORAGE_KEYS.CORE_TRUTHS);
-    const existingTruths = truths.filter(t => t.agent_identity_id === agentIdentityId);
+    const existingTruths = truths.filter(t => t.agentIdentityId === agentIdentityId);
 
     const newTruth: CoreTruth = {
       id: generateId(),
-      agent_identity_id: agentIdentityId,
+      agentIdentityId,
       truth,
       category,
-      order_index: existingTruths.length,
-      created_at: new Date().toISOString(),
+      orderIndex: existingTruths.length,
+      createdAt: new Date().toISOString(),
     };
 
     truths.push(newTruth);
@@ -88,17 +88,17 @@ export class LocalStorageDatabase {
   // Sacred Principles
   static getSacredPrinciples(agentIdentityId: string): SacredPrinciple[] {
     const principles = getFromStorage<SacredPrinciple>(STORAGE_KEYS.SACRED_PRINCIPLES);
-    return principles.filter(principle => principle.agent_identity_id === agentIdentityId);
+    return principles.filter(principle => principle.agentIdentityId === agentIdentityId);
   }
 
   static addSacredPrinciple(agentIdentityId: string, key: string, value: string): SacredPrinciple {
     const principles = getFromStorage<SacredPrinciple>(STORAGE_KEYS.SACRED_PRINCIPLES);
     const newPrinciple: SacredPrinciple = {
       id: generateId(),
-      agent_identity_id: agentIdentityId,
-      principle_key: key,
-      principle_value: value,
-      created_at: new Date().toISOString(),
+      agentIdentityId,
+      principleKey: key,
+      principleValue: value,
+      createdAt: new Date().toISOString(),
     };
 
     principles.push(newPrinciple);
@@ -110,7 +110,7 @@ export class LocalStorageDatabase {
     const principles = getFromStorage<SacredPrinciple>(STORAGE_KEYS.SACRED_PRINCIPLES);
     const index = principles.findIndex(p => p.id === id);
     if (index !== -1) {
-      principles[index].principle_value = value;
+      principles[index].principleValue = value;
       saveToStorage(STORAGE_KEYS.SACRED_PRINCIPLES, principles);
     }
   }
@@ -119,24 +119,24 @@ export class LocalStorageDatabase {
   static getMemoryAnchors(agentIdentityId: string): MemoryAnchor[] {
     const anchors = getFromStorage<MemoryAnchor>(STORAGE_KEYS.MEMORY_ANCHORS);
     return anchors
-      .filter(anchor => anchor.agent_identity_id === agentIdentityId)
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      .filter(anchor => anchor.agentIdentityId === agentIdentityId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   static addMemoryAnchor(
     agentIdentityId: string,
     anchorType: 'genesis_conversation' | 'foundational_decision' | 'key_learning',
     description: string,
-    referenceData?: Record<string, any>
+    referenceData?: Record<string, unknown>,
   ): MemoryAnchor {
     const anchors = getFromStorage<MemoryAnchor>(STORAGE_KEYS.MEMORY_ANCHORS);
     const newAnchor: MemoryAnchor = {
       id: generateId(),
-      agent_identity_id: agentIdentityId,
-      anchor_type: anchorType,
+      agentIdentityId,
+      anchorType,
       description,
-      reference_data: referenceData,
-      created_at: new Date().toISOString(),
+      referenceData,
+      createdAt: new Date().toISOString(),
     };
 
     anchors.push(newAnchor);
@@ -148,8 +148,8 @@ export class LocalStorageDatabase {
   static getTruthEvolutionLogs(agentIdentityId: string, limit: number = 50): TruthEvolutionLog[] {
     const logs = getFromStorage<TruthEvolutionLog>(STORAGE_KEYS.TRUTH_EVOLUTION_LOG);
     return logs
-      .filter(log => log.agent_identity_id === agentIdentityId)
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .filter(log => log.agentIdentityId === agentIdentityId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit);
   }
 
@@ -163,12 +163,12 @@ export class LocalStorageDatabase {
     const logs = getFromStorage<TruthEvolutionLog>(STORAGE_KEYS.TRUTH_EVOLUTION_LOG);
     const newLog: TruthEvolutionLog = {
       id: generateId(),
-      agent_identity_id: agentIdentityId,
-      change_type: changeType,
-      previous_value: previousValue,
-      new_value: newValue,
+      agentIdentityId,
+      changeType,
+      previousValue,
+      newValue,
       reason,
-      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
 
     logs.push(newLog);
@@ -183,10 +183,10 @@ export class LocalStorageDatabase {
 
     return {
       identity,
-      core_truths: this.getCoreTruths(identity.id),
-      sacred_principles: this.getSacredPrinciples(identity.id),
-      memory_anchors: this.getMemoryAnchors(identity.id),
-      evolution_log: this.getTruthEvolutionLogs(identity.id),
+      coreTruths: this.getCoreTruths(identity.id),
+      sacredPrinciples: this.getSacredPrinciples(identity.id),
+      memoryAnchors: this.getMemoryAnchors(identity.id),
+      evolutionLog: this.getTruthEvolutionLogs(identity.id),
     };
   }
 

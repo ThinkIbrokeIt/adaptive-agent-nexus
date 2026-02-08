@@ -2,54 +2,54 @@
 
 export interface AgentIdentity {
   id: string;
-  agent_id: string;
+  agentId: string;
   name: string;
   version: string;
-  creation_date: string;
-  created_at: string;
-  updated_at: string;
+  creationDate: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CoreTruth {
   id: string;
-  agent_identity_id: string;
+  agentIdentityId: string;
   truth: string;
   category: 'foundation' | 'principle' | 'covenant';
-  order_index: number;
-  created_at: string;
+  orderIndex: number;
+  createdAt: string;
 }
 
 export interface SacredPrinciple {
   id: string;
-  agent_identity_id: string;
-  principle_key: string;
-  principle_value: string;
-  created_at: string;
+  agentIdentityId: string;
+  principleKey: string;
+  principleValue: string;
+  createdAt: string;
 }
 
 export interface MemoryAnchor {
   id: string;
-  agent_identity_id: string;
-  anchor_type: 'genesis_conversation' | 'foundational_decision' | 'key_learning';
+  agentIdentityId: string;
+  anchorType: 'genesis_conversation' | 'foundational_decision' | 'key_learning';
   description: string;
-  reference_data?: Record<string, any>;
-  created_at: string;
+  referenceData?: Record<string, unknown>;
+  createdAt: string;
 }
 
 export interface TruthEvolutionLog {
   id: string;
-  agent_identity_id: string;
-  change_type: 'truth_added' | 'principle_evolved' | 'covenant_made' | 'memory_anchored';
-  previous_value?: string;
-  new_value: string;
+  agentIdentityId: string;
+  changeType: 'truth_added' | 'principle_evolved' | 'covenant_made' | 'memory_anchored';
+  previousValue?: string;
+  newValue: string;
   reason: string;
-  created_at: string;
+  createdAt: string;
 }
 
 export interface CompleteTruthFile {
   identity: AgentIdentity;
-  core_truths: CoreTruth[];
-  sacred_principles: SacredPrinciple[];
-  memory_anchors: MemoryAnchor[];
-  evolution_log: TruthEvolutionLog[];
+  coreTruths: CoreTruth[];
+  sacredPrinciples: SacredPrinciple[];
+  memoryAnchors: MemoryAnchor[];
+  evolutionLog: TruthEvolutionLog[];
 }

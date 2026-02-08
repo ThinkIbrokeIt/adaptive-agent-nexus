@@ -88,7 +88,7 @@ export const useLocalAgentTruth = (agentId: string) => {
   const addMemoryAnchor = async (params: {
     anchorType: 'genesis_conversation' | 'foundational_decision' | 'key_learning';
     description: string;
-    referenceData?: Record<string, any>;
+    referenceData?: Record<string, unknown>;
   }) => {
     if (!truthFile?.identity) throw new Error("Agent identity not found");
 
@@ -130,11 +130,11 @@ export const useLocalAgentTruth = (agentId: string) => {
 
       // Log evolution before change
       LocalStorageDatabase.addTruthEvolutionLog(
-        principle.agent_identity_id,
+        principle.agentIdentityId,
         'principle_evolved',
         params.newValue,
         params.reason,
-        principle.principle_value
+        principle.principleValue
       );
 
       // Update principle

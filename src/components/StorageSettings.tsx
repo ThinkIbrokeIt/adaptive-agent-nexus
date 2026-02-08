@@ -28,6 +28,8 @@ export const StorageSettings = () => {
   const [enableEncryption, setEnableEncryption] = useState<boolean>(false);
   const [maxStorageSize, setMaxStorageSize] = useState<number>(50);
 
+  // Load configuration on mount - intentionally runs once
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const loadConfig = () => {
       const currentConfig = storageConfigManager.getConfig();

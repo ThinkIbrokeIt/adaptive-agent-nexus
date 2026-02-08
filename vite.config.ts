@@ -1,15 +1,17 @@
-import { defineConfig } from "vite";
+import { defineConfig, type ConfigEnv, type UserConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig(async ({ mode }) => {
-  const plugins = [react()];
+export default defineConfig((env: ConfigEnv) => {
+  const isDev = env.mode === 'development';
+  const plugins: Array<ReturnType<typeof react>> = [react()];
 
   // Only add componentTagger in development mode
-  if (mode === 'development') {
+  if (isDev) {
     try {
-      const { componentTagger } = await import("lovable-tagger");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-require-imports
+      const componentTagger = require("lovable-tagger");
       plugins.push(componentTagger());
     } catch (error) {
       // Silently ignore if lovable-tagger is not available
@@ -17,8 +19,8 @@ export default defineConfig(async ({ mode }) => {
     }
   }
 
-  return {
-    base: process.env.NODE_ENV === 'production' ? '/adaptive-agent-nexus/' : '/',
+  const config: UserConfig = {
+    base: env.mode === 'production' ? '/adaptive-agent-nexus/' : '/',
     server: {
       host: "::",
       port: 8080,
@@ -49,4 +51,6 @@ export default defineConfig(async ({ mode }) => {
       minify: 'esbuild', // Use esbuild for minification (faster and built-in)
     },
   };
+
+  return config;
 });
