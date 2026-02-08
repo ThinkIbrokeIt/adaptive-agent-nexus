@@ -58,4 +58,8 @@ interface Window {
     new(): SpeechRecognition;
     prototype: SpeechRecognition;
   };
+  electronAPI?: {
+    showDirectoryPicker: () => Promise<string | null>;
+    getSystemInfo: () => Promise<{ platform: string; arch: string; version: string }>;
+  };
 }

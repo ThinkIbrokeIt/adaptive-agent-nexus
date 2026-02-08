@@ -62,31 +62,181 @@ We're exploring several exciting enhancements to the platform:
 4. **Open in browser:**
    Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
 
-### Testing the Voice Interface
+### Desktop Application Packaging
 
-1. **Enable your microphone:**
-   - When prompted by your browser, allow microphone access
-   - Click the microphone button to activate voice input
-   - Say a command clearly (e.g., "help", "status", or "run workflow")
+The application can be packaged as native desktop applications for Windows, macOS, and Linux.
 
-2. **Test voice output:**
-   - Ensure your speakers are turned on
-   - Click the speaker button to enable voice output if it's not already on
-   - The system will respond to your commands with voice synthesis
+#### Quick Packaging Commands
 
-### Quick Command Test
+```bash
+# Build for all platforms
+npm run dist
 
-To verify the system is working correctly, try these simple commands:
+# Build for specific platforms
+npm run build:electron:win     # Windows
+npm run build:electron:mac     # macOS
+npm run build:electron:linux   # Linux
 
-1. Type or say `help` to see available commands
-2. Type or say `status` to check system status
-3. Type or say `run workflow` to test the McP workflow process
+# Development mode (web + electron)
+npm run electron:dev
 
-### Troubleshooting
+# Check build status
+npm run package status
+```
 
-- If voice recognition isn't working, check that your browser supports the Web Speech API (Chrome recommended)
-- Make sure your microphone is properly connected and has permission
-- If voice output isn't audible, check your system volume and browser audio settings
+#### Generated Files
+
+After building, you'll find the packaged applications in the `dist-electron/` directory:
+
+- **Windows**: `.exe` installer and portable executable
+- **macOS**: `.dmg` disk image
+- **Linux**: `.AppImage` and `.deb` packages
+
+#### System Requirements
+
+- **Windows**: Windows 10 or later
+- **macOS**: macOS 10.13 or later
+- **Linux**: Most modern distributions
+
+### Local Storage Mode
+
+This version runs entirely locally using browser localStorage for data persistence. No external databases or authentication services are required.
+
+**Data Storage:**
+- Agent identities and truths are stored in your browser's localStorage
+- Data persists between sessions but is browser-specific
+- You can export/import data as JSON for backup or transfer
+
+**Features Available:**
+- Full agent truth file management
+- Memory anchor creation
+- Principle evolution tracking
+- Data export/import functionality
+
+### Data Management
+
+**Export Data:**
+- Navigate to the Agent Truth Files page
+- Use the export functionality to download your data as JSON
+
+**Import Data:**
+- Use the import functionality to restore data from a JSON backup
+
+**Clear Data:**
+- Data clearing functionality is available in the truth file management interface
+
+**Browser Storage:**
+- Data is stored locally in your browser
+- Clearing browser data will remove all stored information
+- Use export functionality to backup important data
+### LLM Configuration
+
+The system supports multiple LLM providers for enhanced responses:
+
+1. **Navigate to LLM Settings tab** in the main dashboard
+2. **Choose your provider:**
+   - **Mock**: No API required, uses simulated responses
+   - **OpenAI**: GPT-4, GPT-3.5-turbo (requires API key)
+   - **Anthropic**: Claude models (requires API key)
+   - **Ollama**: Local models (requires Ollama installation)
+
+3. **Configure settings:**
+   - API key (for cloud providers)
+   - Model selection
+   - Temperature and token limits
+   - Test connection before saving
+
+4. **Test your setup:**
+   - Use the "Test Connection" button to verify LLM connectivity
+   - Try commands like "tell me about artificial intelligence" to test real LLM responses
+
+**Getting API Keys:**
+- **OpenAI**: https://platform.openai.com/api-keys
+- **Anthropic**: https://console.anthropic.com/
+- **Ollama**: Install from https://ollama.ai/ (local only)
+### Testing Real LLM Integration
+
+### ✅ **Infrastructure Now Ready**
+
+The app now includes **real LLM integration** instead of mock responses! Agents will use actual AI models for intelligent responses.
+
+### Quick LLM Test
+
+1. **Open the app** at `http://localhost:8090`
+2. **Navigate to LLM Settings** tab
+3. **Choose a provider:**
+   - **Mock**: No setup required (simulated responses)
+   - **OpenAI**: Requires API key from https://platform.openai.com/api-keys
+   - **Anthropic**: Requires API key from https://console.anthropic.com/
+   - **Ollama**: Requires local Ollama installation
+
+4. **Test the connection:**
+   - Click "Test Connection" to verify API connectivity
+   - Try commands like "tell me about artificial intelligence"
+   - Agents now provide real AI-generated responses!
+
+### Example Commands to Test
+
+```
+help
+status
+run workflow
+tell me about machine learning
+search for information about climate change
+```
+
+## What's New in v0.6.0-alpha
+
+### 🚀 Real MCP Workflow Processing
+- **Before**: Simulated workflow execution with mock data
+- **Now**: Full implementation with actual Monitor → Contextualize → Personalize phases
+- **Features**:
+  - Real trigger capture and validation
+  - Live semantic search for context enrichment
+  - LLM-powered personalized responses
+  - Real-time workflow statistics
+
+### 🎯 Interactive Knowledge Graph
+- **Before**: Static visualization
+- **Now**: Fully interactive real-time agent network display
+- **Features**:
+  - Drag-and-drop node positioning
+  - Live agent status updates
+  - Advanced filtering and selection
+  - Detailed node information panels
+
+### 📊 Real Trigger Data
+- **Before**: Mock trigger data in Recent Triggers
+- **Now**: Live trigger tracking from actual workflow processing
+- **Features**:
+  - Automatic trigger logging
+  - Rich metadata display (priority, source, timestamp)
+  - Real-time trigger history
+
+### 🧪 Enhanced Testing Suite
+- **Before**: Basic feature verification
+- **Now**: 14 comprehensive system tests
+- **Features**:
+  - Automated MCP workflow validation
+  - Real-time component testing
+  - Performance monitoring
+
+### Quick Start with New Features
+
+1. **Run Real MCP Workflows**:
+   - Go to Dashboard → Click "Run MCP Workflow"
+   - Watch live progress through all phases
+   - View real triggers in Recent Triggers panel
+
+2. **Explore Interactive Knowledge Graph**:
+   - Navigate to Knowledge Graph tab
+   - Drag nodes, filter agents, view real-time updates
+
+3. **Test System Features**:
+   - System Tests tab → Run comprehensive validation
+   - Monitor real-time test results and performance
+
+---
 
 ## Basic Commands
 
@@ -125,22 +275,21 @@ To verify the system is working correctly, try these simple commands:
 ## Workflow Commands
 
 ### `run workflow`
-- **Description**: Initiates the McP (Monitor-Contextualize-Personalize) workflow
-- **Usage**: Type `run workflow` or say "run workflow"
-- **Stages**:
-  1. Monitor: Captures user interaction
-  2. Contextualize: Retrieves relevant knowledge vectors
-  3. Personalize: Generates adaptive response
-  4. Feedback: Evaluates effectiveness and updates agent knowledge (when enabled)
+- **Description**: Initiates the real McP (Monitor-Contextualize-Personalize) workflow with actual data processing
+- **Usage**: Type `run workflow` or click "Run MCP Workflow" button in dashboard
+- **Real Phases**:
+  1. Monitor: Captures and validates real user interaction data
+  2. Contextualize: Performs live semantic search and user pattern analysis
+  3. Personalize: Generates LLM-powered adaptive responses with personalization
+  4. Feedback: Updates agent knowledge based on real response effectiveness
 - **Example**:
-  ```
+  ```bash
   > run workflow
-  Initiating McP workflow...
-  Monitor phase completed. User interaction stored in DuckDB.
-  Contextualize phase completed. Knowledge vectors retrieved.
-  Personalize phase completed. Response generated.
-  Feedback loop activated. Processing response effectiveness...
-  Adaptation complete. Agent knowledge graph updated.
+  MCP Workflow initiated with real data processing...
+  Monitor phase: Captured trigger with 95% confidence
+  Contextualize phase: Enriched context with 3 relevant items
+  Personalize phase: Generated response with 91% confidence
+  Workflow completed in 1.2 seconds
   ```
 
 ### `feedback [on|off]`
@@ -217,7 +366,7 @@ The agent can also respond to natural language questions and commands that don't
 
 ## Versions
 
-Current Console Version: v0.5.1-alpha
+Current Console Version: v0.6.0-alpha
 
 ## Quick Tips
 - Press Enter to execute a typed command

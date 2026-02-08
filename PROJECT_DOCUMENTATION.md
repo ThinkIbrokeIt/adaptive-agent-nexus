@@ -16,7 +16,86 @@
 
 ---
 
-## Project Overview
+## Recent Updates (v0.6.0-alpha)
+
+### 🚀 Major Enhancements
+
+#### 1. Real MCP Workflow Processing
+- **Before**: Simulated workflow execution with mock data
+- **Now**: Full implementation of Monitor → Contextualize → Personalize phases with real data processing
+- **Features**:
+  - Actual trigger capture and validation
+  - Semantic search integration for context enrichment
+  - Personalized response generation using LLM
+  - Real-time workflow statistics tracking
+
+#### 2. Interactive Knowledge Graph
+- **Before**: Static visualization
+- **Now**: Fully interactive real-time agent network visualization
+- **Features**:
+  - Drag-and-drop node positioning
+  - Real-time agent status updates
+  - Filtering and selection capabilities
+  - Detailed node information panels
+  - SVG-based rendering with smooth animations
+
+#### 3. Real Trigger Data Integration
+- **Before**: Mock trigger data in Recent Triggers component
+- **Now**: Live trigger tracking from actual MCP workflow processing
+- **Features**:
+  - Automatic trigger logging on workflow execution
+  - Rich trigger metadata display (type, priority, source, timestamp)
+  - Real-time trigger history (last 10 triggers)
+  - Empty state handling for new users
+
+#### 4. Enhanced Agent Network
+- **Before**: Basic agent coordination
+- **Now**: Advanced workflow processing with dedicated workflow agent
+- **Features**:
+  - Workflow-agent for MCP processing orchestration
+  - Real-time agent status updates during workflow execution
+  - Enhanced message passing with workflow context
+  - Comprehensive error handling and recovery
+
+#### 5. Comprehensive Testing Suite
+- **Before**: Basic feature verification
+- **Now**: 14 comprehensive system tests covering all major features
+- **Features**:
+  - Automated MCP workflow validation
+  - Real-time component testing
+  - Performance monitoring integration
+  - Browser compatibility verification
+
+### 📋 Updated Usage Instructions
+
+#### Running MCP Workflows
+1. Navigate to the Dashboard tab
+2. Click the "Run MCP Workflow" button in the McP Workflow Processing section
+3. Watch real-time progress through Monitor → Contextualize → Personalize phases
+4. View results in Recent Triggers panel and agent console
+
+#### Exploring the Knowledge Graph
+1. Go to the Knowledge Graph tab
+2. Use interactive controls to:
+   - Filter agents by status or type
+   - Drag nodes to reposition them
+   - Click nodes for detailed information
+   - View real-time connection updates
+
+#### Testing System Features
+1. Navigate to the System Tests tab
+2. Run individual tests or execute all tests
+3. Monitor real-time test results and performance metrics
+4. Review detailed test logs and error reporting
+
+### 🔧 Technical Improvements
+
+- **Type Safety**: Enhanced TypeScript interfaces for MCP workflow types
+- **Performance**: Optimized rendering and state management
+- **Error Handling**: Comprehensive error boundaries and recovery mechanisms
+- **Code Quality**: Improved component architecture and separation of concerns
+
+---
 
 ### System Description
 
@@ -500,63 +579,57 @@ Handles natural language processing:
 - Clean separation of concerns
 - Reusable command logic
 
-### 4. McP Workflow System
+### 4. McP Workflow System ✅ **FULLY IMPLEMENTED**
 
-**Three-Phase Architecture**
-1. **Monitor**: Data collection and observation
-2. **Contextualize**: Analysis and pattern recognition
-3. **Personalize**: Customized response generation
+**Real Three-Phase Architecture**
+1. **Monitor**: Actual data collection and trigger validation with confidence scoring
+2. **Contextualize**: Live semantic search and user pattern analysis using vector databases
+3. **Personalize**: LLM-powered adaptive response generation with personalization factors
 
-**Feedback Loop**
-- Continuous improvement mechanism
-- User feedback integration
-- Adaptive learning capability
+**Active Feedback Loop**
+- Continuous improvement through real workflow execution
+- User interaction tracking and pattern recognition
+- Adaptive learning with measurable confidence scores
 
-### 5. Real-Time Monitoring
+### 5. Real-Time Monitoring ✅ **ENHANCED**
 
-**Performance Metrics**
-- Memory usage (with warning/critical thresholds)
-- CPU utilization
-- Response time tracking
-- Active connections
-- Error rate monitoring
-- System uptime
+**Live Performance Metrics**
+- Real workflow execution statistics (active/completed/failed)
+- Agent status updates during processing
+- Memory usage with dynamic thresholds
+- Response time tracking with phase-specific timing
 
-**Health Indicators**
-- Visual status indicators
-- Threshold-based warnings
-- Real-time updates
-- Historical trending
+**Interactive Health Indicators**
+- Live workflow progress visualization
+- Real-time agent network status
+- Dynamic threshold-based warnings
+- Historical trending with recent activity
 
-### 6. Knowledge Visualization
+### 6. Interactive Knowledge Visualization ✅ **FULLY IMPLEMENTED**
 
-**Knowledge Graph**
-- Visual representation of agent relationships
-- Data flow visualization
-- Interactive graph interface
-- D3.js/Recharts integration
+**Dynamic Knowledge Graph**
+- Real-time agent relationship visualization
+- Interactive SVG-based graph with drag-and-drop
+- Live filtering and selection capabilities
+- Detailed node information with status indicators
+- Smooth animations and responsive design
 
-### 7. Storage Management
+### 7. Storage Management ✅ **INTEGRATED**
 
-**Storage Panel**
-- DuckDB integration (planned)
-- ChromaDB integration (planned)
-- Vector storage for embeddings
-- Data persistence layer
+**Multi-Storage Architecture**
+- DuckDB integration for structured data
+- ChromaDB integration for vector embeddings
+- SQLite for local data persistence
+- MinIO for file storage capabilities
+- Real data flow through all storage layers
 
-### 8. Comprehensive Testing
+### 8. Comprehensive Testing ✅ **EXPANDED**
 
-**Feature Verification**
-- Automated feature testing
-- Component integrity checks
-- Integration testing
-- Browser compatibility verification
-
-**Performance Testing**
-- Load testing capabilities
-- Response time measurement
-- Resource usage monitoring
-- Stress testing framework
+**Advanced Feature Verification**
+- 14 automated system tests covering all features
+- Real MCP workflow validation with live execution
+- Component integrity checks with error simulation
+- Browser compatibility and performance testing
 
 ---
 
@@ -586,6 +659,9 @@ Handles natural language processing:
 - `getAgentById(agentId)`: Retrieve specific agent
 - `getAgentsByCapability(capability)`: Find agents by capability
 - `processCommand(command)`: Process user commands
+- `processMcpWorkflow(trigger)`: Execute real MCP workflow with Monitor→Contextualize→Personalize phases
+- `getWorkflowStatus()`: Get real-time workflow statistics (active/completed/failed)
+- `addRecentTrigger(trigger)`: Add trigger to recent triggers list
 
 ### Custom Hooks
 
@@ -1038,6 +1114,6 @@ The project is currently **ready for development/demo** with a clear path to pro
 ---
 
 **Documentation Version**: 1.0  
-**Last Updated**: 2025-08-19  
-**Project Version**: v0.5.1-alpha  
+**Last Updated**: 2026-02-08  
+**Project Version**: v0.6.0-alpha  
 **Maintainers**: Development Team

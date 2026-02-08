@@ -1,8 +1,10 @@
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CircleArrowUp, Database, Waves, UserCog, RefreshCw } from "lucide-react";
+import { CircleArrowUp, Database, Waves, UserCog, RefreshCw, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useAgentNetwork } from "@/contexts/AgentNetworkContext";
 
 interface McpTriggerCardsProps {
   triggerCount: {
@@ -13,13 +15,36 @@ interface McpTriggerCardsProps {
   };
   processingStage: string | null;
   feedbackEnabled?: boolean;
+  onRunWorkflow?: () => void;
 }
 
-const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true }: McpTriggerCardsProps) => {
+const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true, onRunWorkflow }: McpTriggerCardsProps) => {
+  const { getWorkflowStatus } = useAgentNetwork();
+  const workflowStats = getWorkflowStatus();
+
   const gridCols = feedbackEnabled ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
   
   return (
-    <div className={`grid ${gridCols} gap-4`}>
+    <div className="space-y-4">
+      {/* Workflow Trigger Button */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <h3 className="text-lg font-semibold text-slate-200">MCP Workflow Processing</h3>
+          <Badge variant="outline" className="bg-slate-800/50 text-slate-300 border-slate-600">
+            Active: {workflowStats.activeWorkflows} | Completed: {workflowStats.completedWorkflows} | Failed: {workflowStats.failedWorkflows}
+          </Badge>
+        </div>
+        <Button
+          onClick={onRunWorkflow}
+          disabled={!!processingStage || workflowStats.activeWorkflows > 0}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+        >
+          <Play className="h-4 w-4 mr-2" />
+          {processingStage ? `Processing ${processingStage}...` : workflowStats.activeWorkflows > 0 ? 'Workflow Active' : 'Run MCP Workflow'}
+        </Button>
+      </div>
+
+      <div className={`grid ${gridCols} gap-4`}>
       <Card className="bg-gradient-to-br from-slate-800/90 to-slate-900 border-slate-700 shadow-lg hover:shadow-slate-700/20 transition-all duration-200 hover:-translate-y-1">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
@@ -102,6 +127,7 @@ const McpTriggerCards = ({ triggerCount, processingStage, feedbackEnabled = true
           </CardFooter>
         </Card>
       )}
+    </div>
     </div>
   );
 };

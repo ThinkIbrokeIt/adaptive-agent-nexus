@@ -13,12 +13,14 @@ interface DashboardTabProps {
   };
   processingStage: string | null;
   feedbackEnabled: boolean;
+  onRunWorkflow?: () => void;
 }
 
 const DashboardTab: React.FC<DashboardTabProps> = ({ 
   triggerCount, 
   processingStage, 
-  feedbackEnabled 
+  feedbackEnabled,
+  onRunWorkflow
 }) => {
   return (
     <div className="space-y-4">
@@ -26,6 +28,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({
         triggerCount={triggerCount}
         processingStage={processingStage}
         feedbackEnabled={feedbackEnabled}
+        onRunWorkflow={onRunWorkflow}
       />
       <SystemHealth />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

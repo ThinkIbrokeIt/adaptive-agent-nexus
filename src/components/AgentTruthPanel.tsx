@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { useAgentTruth } from "@/hooks/useAgentTruth";
+import { useLocalAgentTruth } from "@/hooks/useLocalAgentTruth";
 import { TruthFileViewer } from "@/components/TruthFileViewer";
 import { Loader2, Plus, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -19,7 +19,7 @@ interface AgentTruthPanelProps {
 }
 
 export const AgentTruthPanel = ({ agentId, agentName }: AgentTruthPanelProps) => {
-  const { truthFile, isLoading, initializeTruth, addTruth, addMemoryAnchor, evolvePrinciple } = useAgentTruth(agentId);
+  const { truthFile, isLoading, initializeTruth, addTruth, addMemoryAnchor, evolvePrinciple } = useLocalAgentTruth(agentId);
   const { toast } = useToast();
   
   const [initName, setInitName] = useState(agentName);
