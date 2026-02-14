@@ -3,6 +3,7 @@ import SystemHealth from "@/components/SystemHealth";
 import McpTriggerCards from "@/components/McpTriggerCards";
 import RecentTriggers from "@/components/RecentTriggers";
 import WorkflowVisualizer from "@/components/WorkflowVisualizer";
+import WorkflowBootstrap from "@/components/WorkflowBootstrap";
 import { useSystemMetrics } from "@/hooks/useSystemMetrics";
 
 interface DashboardTabProps {
@@ -27,6 +28,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({
 
   return (
     <div className="space-y-4">
+      <WorkflowBootstrap />
       <McpTriggerCards 
         triggerCount={triggerCount}
         processingStage={processingStage}

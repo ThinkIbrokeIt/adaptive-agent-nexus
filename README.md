@@ -1,5 +1,4 @@
-
-# Adaptive Agent Nexus
+# Adaptive Agent Nexus v0.7.0-alpha
 
 ## Introduction
 
@@ -11,6 +10,23 @@ The Adaptive Agent Nexus is an intelligent system designed to bring context-awar
 - **Provide personalized experiences** tailored to specific user needs
 
 The system solves critical challenges in traditional AI implementations, including context amnesia, static knowledge representation, and one-size-fits-all responses. Through its adaptable architecture, the platform bridges the gap between raw data collection and meaningful, personalized agent interactions.
+
+## 🚀 Quick Start (5 minutes)
+
+1. **Clone & Install**:
+
+   ```bash
+   git clone https://github.com/your-username/adaptive-agent-nexus.git
+   cd adaptive-agent-nexus
+   npm install
+   npm run dev
+   ```
+
+2. **Open**: http://localhost:5173
+
+3. **Try**: Type `help` or click "Run MCP Workflow"
+
+📖 **[Complete User Guide](USER_GUIDE.md)** - Instructions & Troubleshooting
 
 ## Architecture
 
@@ -44,17 +60,20 @@ We're exploring several exciting enhancements to the platform:
 ### Installation
 
 1. **Clone the repository:**
+
    ```
    git clone https://github.com/your-username/adaptive-agent-nexus.git
    cd adaptive-agent-nexus
    ```
 
 2. **Install dependencies:**
+
    ```
    npm install
    ```
 
 3. **Start the development server:**
+
    ```
    npm run dev
    ```
@@ -103,11 +122,13 @@ After building, you'll find the packaged applications in the `dist-electron/` di
 This version runs entirely locally using browser localStorage for data persistence. No external databases or authentication services are required.
 
 **Data Storage:**
+
 - Agent identities and truths are stored in your browser's localStorage
 - Data persists between sessions but is browser-specific
 - You can export/import data as JSON for backup or transfer
 
 **Features Available:**
+
 - Full agent truth file management
 - Memory anchor creation
 - Principle evolution tracking
@@ -116,19 +137,24 @@ This version runs entirely locally using browser localStorage for data persisten
 ### Data Management
 
 **Export Data:**
+
 - Navigate to the Agent Truth Files page
 - Use the export functionality to download your data as JSON
 
 **Import Data:**
+
 - Use the import functionality to restore data from a JSON backup
 
 **Clear Data:**
+
 - Data clearing functionality is available in the truth file management interface
 
 **Browser Storage:**
+
 - Data is stored locally in your browser
 - Clearing browser data will remove all stored information
 - Use export functionality to backup important data
+
 ### LLM Configuration
 
 The system supports multiple LLM providers for enhanced responses:
@@ -151,9 +177,11 @@ The system supports multiple LLM providers for enhanced responses:
    - Try commands like "tell me about artificial intelligence" to test real LLM responses
 
 **Getting API Keys:**
+
 - **OpenAI**: https://platform.openai.com/api-keys
 - **Anthropic**: https://console.anthropic.com/
 - **Ollama**: Install from https://ollama.ai/ (local only)
+
 ### Testing Real LLM Integration
 
 ### ✅ **Infrastructure Now Ready**
@@ -185,62 +213,50 @@ tell me about machine learning
 search for information about climate change
 ```
 
-## What's New in v0.6.0-alpha
+## What's New in v0.7.0-alpha
 
-### 🚀 Real MCP Workflow Processing
-- **Before**: Simulated workflow execution with mock data
-- **Now**: Full implementation with actual Monitor → Contextualize → Personalize phases
-- **Features**:
-  - Real trigger capture and validation
-  - Live semantic search for context enrichment
-  - LLM-powered personalized responses
-  - Real-time workflow statistics
+### 🚀 Enhanced MCP Workflow Processing
 
-### 🎯 Interactive Knowledge Graph
-- **Before**: Static visualization
-- **Now**: Fully interactive real-time agent network display
-- **Features**:
-  - Drag-and-drop node positioning
-  - Live agent status updates
-  - Advanced filtering and selection
-  - Detailed node information panels
+- **Improved Reliability**: Better error handling and recovery mechanisms
+- **Performance Optimization**: Faster workflow execution with optimized data processing
+- **Enhanced Monitoring**: More detailed progress tracking and metrics
 
-### 📊 Real Trigger Data
-- **Before**: Mock trigger data in Recent Triggers
-- **Now**: Live trigger tracking from actual workflow processing
-- **Features**:
-  - Automatic trigger logging
-  - Rich metadata display (priority, source, timestamp)
-  - Real-time trigger history
+### 🔒 Security & Configuration
 
-### 🧪 Enhanced Testing Suite
-- **Before**: Basic feature verification
-- **Now**: 14 comprehensive system tests
-- **Features**:
-  - Automated MCP workflow validation
-  - Real-time component testing
-  - Performance monitoring
+- **Secure Configuration Management**: Environment variables for sensitive data
+- **Git Safety**: Automatic exclusion of secrets from version control
+- **MCP Integration**: Improved Model Context Protocol support
 
-### Quick Start with New Features
+### 🧪 Expanded Testing Suite
 
-1. **Run Real MCP Workflows**:
-   - Go to Dashboard → Click "Run MCP Workflow"
-   - Watch live progress through all phases
-   - View real triggers in Recent Triggers panel
+- **Additional Test Cases**: More comprehensive system validation
+- **Performance Monitoring**: Real-time metrics and diagnostics
+- **Error Reporting**: Enhanced debugging and troubleshooting tools
 
-2. **Explore Interactive Knowledge Graph**:
-   - Navigate to Knowledge Graph tab
-   - Drag nodes, filter agents, view real-time updates
+### 🎯 User Experience Improvements
 
-3. **Test System Features**:
-   - System Tests tab → Run comprehensive validation
-   - Monitor real-time test results and performance
+- **Better Error Messages**: Clear, actionable error reporting
+- **Voice Recognition**: Improved reliability and accuracy
+- **Interface Polish**: Enhanced UI/UX across all components
+
+### 📚 Documentation
+
+- **User Guide**: Comprehensive instructions and troubleshooting
+- **Configuration Guide**: Step-by-step setup instructions
+- **FAQ Section**: Common questions and solutions
+
+### 🔧 Technical Enhancements
+
+- **Code Quality**: Improved TypeScript types and error handling
+- **Build Process**: Optimized packaging and deployment
+- **Dependency Updates**: Latest stable versions of all packages
 
 ---
 
 ## Basic Commands
 
 ### `help`
+
 - **Description**: Displays a list of available commands
 - **Usage**: Simply type `help` or say "help"
 - **Example**:
@@ -250,6 +266,7 @@ search for information about climate change
   ```
 
 ### `status`
+
 - **Description**: Provides an overview of the system's current state
 - **Usage**: Type `status` or say "status"
 - **Example**:
@@ -264,6 +281,7 @@ search for information about climate change
   ```
 
 ### `clear`
+
 - **Description**: Clears the console log
 - **Usage**: Type `clear` or say "clear"
 - **Example**:
@@ -275,6 +293,7 @@ search for information about climate change
 ## Workflow Commands
 
 ### `run workflow`
+
 - **Description**: Initiates the real McP (Monitor-Contextualize-Personalize) workflow with actual data processing
 - **Usage**: Type `run workflow` or click "Run MCP Workflow" button in dashboard
 - **Real Phases**:
@@ -293,16 +312,18 @@ search for information about climate change
   ```
 
 ### `feedback [on|off]`
+
 - **Description**: Controls the agent's self-learning feedback loop
 - **Usage**: Type `feedback on` or `feedback off`
 - **Example**:
+
   ```
   > feedback on
   Feedback loop enabled. Agent will continuously learn from interactions.
-  
+
   > feedback off
   Feedback loop disabled. Agent will not adapt from interactions.
-  
+
   > feedback
   Current feedback status: ENABLED
   ```
@@ -310,21 +331,24 @@ search for information about climate change
 ## Voice Interface
 
 ### `voice [on|off]`
+
 - **Description**: Controls the agent's voice response capability
 - **Usage**: Type `voice on` or `voice off`
 - **Example**:
+
   ```
   > voice on
   Voice output enabled.
-  
+
   > voice off
   Voice output disabled.
-  
+
   > voice
   Current voice status: ENABLED
   ```
 
 ### Using Voice Commands
+
 - Click the microphone button to start voice recognition
 - Speak your command clearly
 - The agent will process your speech and execute the command
@@ -333,6 +357,7 @@ search for information about climate change
 ## Knowledge Queries
 
 ### `tell me about [topic]`
+
 - **Description**: Queries the agent's knowledge base about a specific topic
 - **Usage**: Type `tell me about [topic]` or ask using voice
 - **Example**:
@@ -345,6 +370,7 @@ search for information about climate change
 ## Database Interaction
 
 ### `query`
+
 - **Description**: Executes database queries
 - **Usage**: `query [db] [parameters]`
 - **Example**:
@@ -354,6 +380,7 @@ search for information about climate change
   ```
 
 ## Conversational Interaction
+
 The agent can also respond to natural language questions and commands that don't match specific command formats. Simply type your question or use voice input to engage in a conversation.
 
 ## Troubleshooting
@@ -366,9 +393,10 @@ The agent can also respond to natural language questions and commands that don't
 
 ## Versions
 
-Current Console Version: v0.6.0-alpha
+Current Console Version: v0.7.0-alpha
 
 ## Quick Tips
+
 - Press Enter to execute a typed command
 - Click the microphone button to use voice commands
 - Toggle voice output on/off using the speaker button

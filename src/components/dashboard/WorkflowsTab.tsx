@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, RefreshCw, Save, Play, Settings, Eye, Edit, Plus, History, Copy, Download, Upload, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { N8nAPI, N8nWorkflow, N8nConfig, N8nWorkflowVersion, BulkWorkflowOperation, TrainingWorkflowIntegration, getStoredN8nConfig, storeN8nConfig, createN8nAPI } from "@/utils/n8n-api";
+import { N8nAPI, N8nWorkflow, N8nConfig, N8nWorkflowVersion, BulkWorkflowOperation, TrainingWorkflowIntegration, getStoredN8nConfig, storeN8nConfig, createN8nAPI, testN8nConnection } from "@/utils/n8n-api";
 
 const WorkflowsTab = () => {
   const { toast } = useToast();
@@ -183,6 +183,33 @@ const WorkflowsTab = () => {
     const newConfig = { ...config, [field]: value };
     setConfig(newConfig);
     storeN8nConfig(newConfig);
+  };
+
+  const testConnection = async () => {
+    setIsLoading(true);
+    try {
+      const result = await testN8nConnection();
+      if (result.success) {
+        toast({
+          title: "Connection Successful",
+          description: result.message + (result.version ? ` (n8n ${result.version})` : ''),
+        });
+      } else {
+        toast({
+          title: "Connection Failed",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Connection Test Error",
+        description: error instanceof Error ? error.message : 'Unknown error occurred',
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const selectWorkflow = (workflow: N8nWorkflow) => {
@@ -389,23 +416,43 @@ const WorkflowsTab = () => {
                   />
                 </div>
               </div>
-              <Button
-                onClick={loadWorkflows}
-                disabled={!config.apiKey || isLoading}
-                className="w-full"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Loading Workflows...
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Load Workflows
-                  </>
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={testConnection}
+                  disabled={!config.baseUrl || isLoading}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Testing...
+                    </>
+                  ) : (
+                    <>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Test Connection
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={loadWorkflows}
+                  disabled={!config.apiKey || isLoading}
+                  className="flex-1"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Loading Workflows...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Load Workflows
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

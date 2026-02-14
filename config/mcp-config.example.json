@@ -1,0 +1,27 @@
+{
+  "mcp": {
+    "version": "1.0",
+    "servers": [
+      {
+        "name": "example-server",
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-everything"],
+        "env": {
+          "NODE_ENV": "development"
+        }
+      }
+    ],
+    "clients": [
+      {
+        "name": "example-client",
+        "type": "http",
+        "endpoint": "http://localhost:3000"
+      }
+    ]
+  },
+  "settings": {
+    "logLevel": "info",
+    "timeout": 30000,
+    "retryAttempts": 3
+  }
+}

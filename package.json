@@ -2,7 +2,7 @@
   "type": "module",
   "name": "adaptive-agent-nexus",
   "productName": "Adaptive Agent Nexus",
-  "version": "1.0.0",
+  "version": "0.7.0-alpha",
   "description": "A sophisticated multi-agent AI system with LLM integration",
   "author": {
     "name": "Your Name",

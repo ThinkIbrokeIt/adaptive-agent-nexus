@@ -3,6 +3,23 @@
  * Provides functions to interact with n8n workflows programmatically
  */
 
+export interface N8nConfig {
+  baseUrl: string;
+  apiKey: string;
+}
+
+export interface N8nWorkflow {
+  id: string;
+  name: string;
+  active: boolean;
+  nodes: any[];
+  connections: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+  tags?: string[];
+  settings?: Record<string, any>;
+}
+
 export interface N8nWorkflowVersion {
   id: string;
   workflowId: string;
@@ -35,10 +52,65 @@ export class N8nAPI {
   }
 
   /**
-   * Update configuration
+   * Test connection to n8n instance
    */
-  updateConfig(config: Partial<N8nConfig>) {
-    this.config = { ...this.config, ...config };
+  async testConnection(): Promise<{ success: boolean; message: string; version?: string }> {
+    try {
+      const response = await fetch(`${this.config.baseUrl}/rest/workflows`, {
+        method: 'HEAD',
+        headers: {
+          'X-N8N-API-KEY': this.config.apiKey
+        }
+      });
+
+      if (response.ok) {
+        // Try to get version info
+        try {
+          const versionResponse = await fetch(`${this.config.baseUrl}/rest/version`, {
+            headers: {
+              'X-N8N-API-KEY': this.config.apiKey
+            }
+          });
+          const versionData = await versionResponse.json();
+          return {
+            success: true,
+            message: 'Successfully connected to n8n',
+            version: versionData.version || 'Unknown'
+          };
+        } catch {
+          return {
+            success: true,
+            message: 'Successfully connected to n8n (version check failed)'
+          };
+        }
+      } else if (response.status === 401) {
+        return {
+          success: false,
+          message: 'Authentication failed. Please check your API key.'
+        };
+      } else if (response.status === 403) {
+        return {
+          success: false,
+          message: 'Access forbidden. Please check your API key permissions.'
+        };
+      } else {
+        return {
+          success: false,
+          message: `Connection failed: ${response.status} ${response.statusText}`
+        };
+      }
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return {
+          success: false,
+          message: `Cannot connect to ${this.config.baseUrl}. Please check if n8n is running and the URL is correct.`
+        };
+      }
+      return {
+        success: false,
+        message: `Connection error: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
   }
 
   /**
@@ -162,6 +234,26 @@ export class N8nAPI {
     if (!response.ok) {
       throw new Error(`Failed to deactivate workflow: ${response.statusText}`);
     }
+  }
+
+  /**
+   * Import a workflow from JSON data
+   */
+  async importWorkflow(workflowJson: any): Promise<N8nWorkflow> {
+    const response = await fetch(`${this.config.baseUrl}/rest/workflows`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-N8N-API-KEY': this.config.apiKey
+      },
+      body: JSON.stringify(workflowJson)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to import workflow: ${response.statusText}`);
+    }
+
+    return await response.json();
   }
 
   /**
@@ -508,4 +600,12 @@ export function storeN8nConfig(config: N8nConfig) {
  */
 export function createN8nAPI(): N8nAPI {
   return new N8nAPI(getStoredN8nConfig());
+}
+
+/**
+ * Test n8n connection with stored configuration
+ */
+export async function testN8nConnection(): Promise<{ success: boolean; message: string; version?: string }> {
+  const api = createN8nAPI();
+  return api.testConnection();
 }

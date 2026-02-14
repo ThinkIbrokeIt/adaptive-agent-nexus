@@ -1,0 +1,175 @@
+{
+  "name": "Adaptive Agent McP Workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "user-input-capture",
+      "name": "User Input Capture",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "mcp-webhook"
+    },
+    {
+      "parameters": {
+        "functionCode": "const input = $json;\n\n// Log interaction for monitoring\nconsole.log('McP Workflow: User input received', {\n  text: input.data?.text,\n  timestamp: new Date().toISOString(),\n  contextTypes: input.metadata?.contextTypes\n});\n\n// Add monitoring metadata\ninput.monitoring = {\n  receivedAt: new Date().toISOString(),\n  source: 'mcp-workflow',\n  confidence: Math.random() // Simulated confidence score\n};\n\nreturn input;"
+      },
+      "id": "monitor-phase",
+      "name": "Monitor Phase",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Contextualize phase - enrich with semantic search\n\nconst input = $json;\nconst userText = input.data?.text || '';\n\n// Simulated semantic search for context enrichment\n// In production, this would call a vector database or search API\nconst contextResults = [\n  { type: 'similar_interaction', content: 'Previous user asked about AI', relevance: 0.85 },\n  { type: 'knowledge_base', content: 'AI systems learn from data patterns', relevance: 0.72 },\n  { type: 'user_profile', content: 'User prefers technical explanations', relevance: 0.91 }\n];\n\n// Filter high-relevance context\ninput.context = contextResults.filter(item => item.relevance > 0.7);\n\nconsole.log('McP Workflow: Context enriched', {\n  originalText: userText,\n  contextItems: input.context.length\n});\n\nreturn input;"
+      },
+      "id": "contextualize-phase",
+      "name": "Contextualize Phase",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are an intelligent agent processing a Monitor-Contextualize-Personalize (McP) workflow. Your task is to provide personalized, context-aware responses based on the user's input and the context provided."
+          },
+          {
+            "role": "user",
+            "content": "User Input: {{$json.data.text}}\n\nContext Information:\n{{$json.context}}\n\nMonitoring Data:\n{{$json.monitoring}}\n\nProvide a personalized response that demonstrates understanding of the user's needs and context."
+          }
+        ],
+        "options": {}
+      },
+      "id": "personalize-phase",
+      "name": "Personalize Phase (AI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credential",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Evaluate response effectiveness\nconst response = $json;\n\n// Simulated evaluation metrics\nresponse.evaluation = {\n  relevance: Math.random(),\n  accuracy: Math.random(),\n  personalization: Math.random(),\n  userSatisfaction: Math.random(),\n  timestamp: new Date().toISOString()\n};\n\n// Determine if response meets quality thresholds\nconst qualityScore = (\n  response.evaluation.relevance +\n  response.evaluation.accuracy +\n  response.evaluation.personalization\n) / 3;\n\nresponse.evaluation.qualityScore = qualityScore;\nresponse.evaluation.passedThreshold = qualityScore > 0.7;\n\nconsole.log('McP Workflow: Response evaluated', {\n  qualityScore: qualityScore.toFixed(2),\n  passed: response.evaluation.passedThreshold\n});\n\nreturn response;"
+      },
+      "id": "evaluate-response",
+      "name": "Evaluate Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Feedback loop - update agent knowledge\n\nconst evaluation = $json.evaluation;\nconst userInput = $json.data?.text;\nconst aiResponse = $json.choices?.[0]?.message?.content;\n\n// Only update knowledge if response quality is good\nif (evaluation.passedThreshold) {\n  console.log('McP Workflow: Updating knowledge base', {\n    input: userInput?.substring(0, 50) + '...',\n    qualityScore: evaluation.qualityScore\n  });\n  \n  // In production, this would update a vector database\n  // or send feedback to a learning system\n  \n  $json.feedback = {\n    action: 'knowledge_updated',\n    timestamp: new Date().toISOString(),\n    qualityScore: evaluation.qualityScore\n  };\n} else {\n  console.log('McP Workflow: Response quality below threshold, skipping knowledge update');\n  \n  $json.feedback = {\n    action: 'quality_check_failed',\n    timestamp: new Date().toISOString(),\n    qualityScore: evaluation.qualityScore\n  };\n}\n\nreturn $json;"
+      },
+      "id": "feedback-loop",
+      "name": "Feedback Loop",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "=$json",
+        "options": {}
+      },
+      "id": "return-response",
+      "name": "Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    }
+  ],
+  "connections": {
+    "User Input Capture": {
+      "main": [
+        [
+          {
+            "node": "Monitor Phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Phase": {
+      "main": [
+        [
+          {
+            "node": "Contextualize Phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contextualize Phase": {
+      "main": [
+        [
+          {
+            "node": "Personalize Phase (AI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Personalize Phase (AI)": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Response": {
+      "main": [
+        [
+          {
+            "node": "Feedback Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback Loop": {
+      "main": [
+        [
+          {
+            "node": "Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "instanceId": "mcp-workflow-instance"
+  },
+  "tags": ["mcp", "adaptive-agent", "ai-workflow"]
+}

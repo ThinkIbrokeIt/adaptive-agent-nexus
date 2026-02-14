@@ -16,11 +16,12 @@
 
 ---
 
-## Recent Updates (v0.6.0-alpha)
+## Recent Updates (v0.7.0-alpha)
 
 ### 🚀 Major Enhancements
 
 #### 1. Real MCP Workflow Processing
+
 - **Before**: Simulated workflow execution with mock data
 - **Now**: Full implementation of Monitor → Contextualize → Personalize phases with real data processing
 - **Features**:
@@ -30,6 +31,7 @@
   - Real-time workflow statistics tracking
 
 #### 2. Interactive Knowledge Graph
+
 - **Before**: Static visualization
 - **Now**: Fully interactive real-time agent network visualization
 - **Features**:
@@ -40,6 +42,7 @@
   - SVG-based rendering with smooth animations
 
 #### 3. Real Trigger Data Integration
+
 - **Before**: Mock trigger data in Recent Triggers component
 - **Now**: Live trigger tracking from actual MCP workflow processing
 - **Features**:
@@ -49,6 +52,7 @@
   - Empty state handling for new users
 
 #### 4. Enhanced Agent Network
+
 - **Before**: Basic agent coordination
 - **Now**: Advanced workflow processing with dedicated workflow agent
 - **Features**:
@@ -58,6 +62,7 @@
   - Comprehensive error handling and recovery
 
 #### 5. Comprehensive Testing Suite
+
 - **Before**: Basic feature verification
 - **Now**: 14 comprehensive system tests covering all major features
 - **Features**:
@@ -69,12 +74,14 @@
 ### 📋 Updated Usage Instructions
 
 #### Running MCP Workflows
+
 1. Navigate to the Dashboard tab
 2. Click the "Run MCP Workflow" button in the McP Workflow Processing section
 3. Watch real-time progress through Monitor → Contextualize → Personalize phases
 4. View results in Recent Triggers panel and agent console
 
 #### Exploring the Knowledge Graph
+
 1. Go to the Knowledge Graph tab
 2. Use interactive controls to:
    - Filter agents by status or type
@@ -83,6 +90,7 @@
    - View real-time connection updates
 
 #### Testing System Features
+
 1. Navigate to the System Tests tab
 2. Run individual tests or execute all tests
 3. Monitor real-time test results and performance metrics
@@ -134,17 +142,20 @@ The project started as a single-agent system and evolved into a multi-agent arch
 ### Key Development Milestones
 
 #### 1. **Base System Setup**
+
 - Created React + TypeScript + Vite foundation
 - Implemented core UI components using shadcn/ui
 - Set up routing and basic navigation
 
 #### 2. **Agent Network Implementation**
+
 - Designed multi-agent architecture with specialized roles
 - Created AgentNetworkContext for centralized agent management
 - Implemented agent-to-agent communication protocol
 - Added task delegation system
 
 #### 3. **Command Processing System**
+
 - Built modular command processing pipeline
 - Created separate command handlers for different categories:
   - Info commands (help, status, clear)
@@ -154,6 +165,7 @@ The project started as a single-agent system and evolved into a multi-agent arch
 - Integrated voice command support
 
 #### 4. **Voice Interface Integration**
+
 - Implemented speech recognition using Web Speech API
 - Added text-to-speech synthesis
 - Created speech controls component
@@ -162,17 +174,20 @@ The project started as a single-agent system and evolved into a multi-agent arch
 #### 5. **Critical Bug Fixes**
 
 **UUID Import Error Resolution**
+
 - **Problem**: `uuid` package not properly installed
 - **Solution**: Installed `uuid` and `@types/uuid` packages
 - **Impact**: Fixed agent task ID generation
 
 **Dispatcher Null Error Resolution**
+
 - **Problem**: Dispatcher was null when processCommand was called
 - **Root Cause**: AgentNetworkProvider was not wrapping the App component
 - **Solution**: Wrapped App with AgentNetworkProvider in main.tsx
 - **Impact**: Fixed agent network context availability throughout the app
 
 #### 6. **Architecture Refactoring**
+
 - Split command processing into modular files:
   - `infoCommands.ts`
   - `searchCommands.ts`
@@ -182,6 +197,7 @@ The project started as a single-agent system and evolved into a multi-agent arch
 - Reduced file sizes and complexity
 
 #### 7. **Testing Infrastructure**
+
 - Created FeatureTester component for automated feature verification
 - Implemented PerformanceMonitor for real-time system metrics
 - Added System Tests tab to dashboard
@@ -203,16 +219,16 @@ graph TD
     D --> G[Workflow Agent]
     D --> H[Data Agent]
     D --> I[Learning Agent]
-    
+
     E --> J[Response Generator]
     F --> J
     G --> J
     H --> J
     I --> J
-    
+
     J --> K[Voice Synthesis]
     J --> L[Console Log]
-    
+
     M[Performance Monitor] --> N[System Metrics]
     M --> O[Health Indicators]
 ```
@@ -227,13 +243,13 @@ graph LR
     B -->|Workflow/Process| E[Workflow Agent]
     B -->|Data Query| F[Data Agent]
     B -->|Learning| G[Learning Agent]
-    
+
     C --> H[Task Queue]
     D --> H
     E --> H
     G --> H
     F --> H
-    
+
     H --> I[Execution Engine]
     I --> J[Result]
 ```
@@ -248,7 +264,7 @@ graph TD
     D --> E{Personalization Check}
     E --> F[Personalize Phase]
     F --> G[Output]
-    
+
     G --> H{Feedback Loop}
     H -->|Adjust| B
     H -->|Complete| I[Final Result]
@@ -262,19 +278,19 @@ graph TD
     B --> C[Dashboard Tab]
     B --> D[Workflows Tab]
     B --> E[System Tests Tab]
-    
+
     C --> F[SystemHealth]
     C --> G[McpTriggerCards]
     C --> H[RecentTriggers]
     C --> I[AgentConsole]
-    
+
     D --> J[WorkflowVisualizer]
     D --> K[StoragePanel]
     D --> L[KnowledgeGraph]
-    
+
     E --> M[FeatureTester]
     E --> N[PerformanceMonitor]
-    
+
     I --> O[AgentStatus]
     I --> P[ConsoleLog]
     I --> Q[CommandInput]
@@ -332,17 +348,17 @@ src/
 
 ### Key Files & Their Purposes
 
-| File | Purpose |
-|------|---------|
-| `main.tsx` | Application entry point, wraps app with providers |
-| `App.tsx` | Main application component, routing setup |
-| `AgentNetworkContext.tsx` | Agent network state management and coordination |
-| `useAgentCommands.ts` | Command processing and log management |
-| `AgentConsole.tsx` | Main console interface for agent interaction |
-| `Index.tsx` | Dashboard page with tabs for different views |
-| `FeatureTester.tsx` | Automated feature verification suite |
-| `PerformanceMonitor.tsx` | Real-time system performance tracking |
-| `agent.ts` | TypeScript type definitions for agents |
+| File                      | Purpose                                           |
+| ------------------------- | ------------------------------------------------- |
+| `main.tsx`                | Application entry point, wraps app with providers |
+| `App.tsx`                 | Main application component, routing setup         |
+| `AgentNetworkContext.tsx` | Agent network state management and coordination   |
+| `useAgentCommands.ts`     | Command processing and log management             |
+| `AgentConsole.tsx`        | Main console interface for agent interaction      |
+| `Index.tsx`               | Dashboard page with tabs for different views      |
+| `FeatureTester.tsx`       | Automated feature verification suite              |
+| `PerformanceMonitor.tsx`  | Real-time system performance tracking             |
+| `agent.ts`                | TypeScript type definitions for agents            |
 
 ---
 
@@ -351,6 +367,7 @@ src/
 ### Agent Types & Capabilities
 
 #### 1. **Primary Agent**
+
 - **Type**: `primary`
 - **Capabilities**: `conversation`, `workflow`
 - **Role**: Main coordinator and conversational interface
@@ -361,6 +378,7 @@ src/
   - User interaction
 
 #### 2. **Research Agent**
+
 - **Type**: `research`
 - **Capabilities**: `search`
 - **Role**: Information retrieval and research
@@ -371,6 +389,7 @@ src/
   - Knowledge acquisition
 
 #### 3. **Workflow Agent**
+
 - **Type**: `workflow`
 - **Capabilities**: `workflow`
 - **Role**: Process execution and workflow management
@@ -381,6 +400,7 @@ src/
   - Workflow orchestration
 
 #### 4. **Data Agent**
+
 - **Type**: `data`
 - **Capabilities**: `data-query`
 - **Role**: Data querying and management
@@ -391,6 +411,7 @@ src/
   - Data processing
 
 #### 5. **Learning Agent**
+
 - **Type**: `learning`
 - **Capabilities**: `learning`
 - **Role**: Knowledge acquisition and model improvement
@@ -406,9 +427,9 @@ Agents communicate through a message-passing system:
 
 ```typescript
 interface AgentMessage {
-  from: string;      // Source agent ID
-  to: string;        // Target agent ID
-  content: any;      // Message payload
+  from: string; // Source agent ID
+  to: string; // Target agent ID
+  content: any; // Message payload
   timestamp: string; // ISO timestamp
 }
 ```
@@ -419,12 +440,12 @@ Tasks are delegated based on agent capabilities:
 
 ```typescript
 interface AgentTask {
-  id: string;           // Unique task ID (UUID)
-  agentId: string;      // Assigned agent ID
-  type: string;         // Task type
-  data: any;            // Task data
-  timestamp: string;    // Creation timestamp
-  status: AgentStatus;  // Current status
+  id: string; // Unique task ID (UUID)
+  agentId: string; // Assigned agent ID
+  type: string; // Task type
+  data: any; // Task data
+  timestamp: string; // Creation timestamp
+  status: AgentStatus; // Current status
 }
 ```
 
@@ -443,32 +464,33 @@ interface AgentTask {
 
 #### Basic Commands
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `help` | Display all available commands | `help` |
+| Command  | Description                          | Example  |
+| -------- | ------------------------------------ | -------- |
+| `help`   | Display all available commands       | `help`   |
 | `status` | Show system status and configuration | `status` |
-| `clear` | Clear the console log | `clear` |
+| `clear`  | Clear the console log                | `clear`  |
 
 #### Configuration Commands
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `feedback on/off` | Enable/disable feedback loops | `feedback on` |
-| `voice on/off` | Enable/disable voice responses | `voice off` |
+| Command           | Description                    | Example       |
+| ----------------- | ------------------------------ | ------------- |
+| `feedback on/off` | Enable/disable feedback loops  | `feedback on` |
+| `voice on/off`    | Enable/disable voice responses | `voice off`   |
 
 #### Action Commands
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `search <query>` | Perform a web search | `search quantum computing` |
-| `workflow` | Execute McP workflow | `workflow` |
-| `run workflow` | Alternative workflow trigger | `run workflow` |
-| `query <question>` | Query the data agent | `query user statistics` |
-| `tell me about <topic>` | Get information about a topic | `tell me about AI agents` |
+| Command                 | Description                   | Example                    |
+| ----------------------- | ----------------------------- | -------------------------- |
+| `search <query>`        | Perform a web search          | `search quantum computing` |
+| `workflow`              | Execute McP workflow          | `workflow`                 |
+| `run workflow`          | Alternative workflow trigger  | `run workflow`             |
+| `query <question>`      | Query the data agent          | `query user statistics`    |
+| `tell me about <topic>` | Get information about a topic | `tell me about AI agents`  |
 
 #### Natural Language Commands
 
 The system also processes natural language commands through the agent network:
+
 - Questions: "What is quantum computing?"
 - Requests: "Find information about React hooks"
 - Learning: "Learn about machine learning"
@@ -485,21 +507,21 @@ graph TD
     B -->|Data| F[Data Agent]
     B -->|Learning| G[Learning Agent]
     B -->|Natural Language| H[Agent Network Router]
-    
+
     H --> I{Capability Match}
     I --> D
     I --> E
     I --> F
     I --> G
     I --> J[Primary Agent]
-    
+
     C --> K[Response]
     D --> K
     E --> K
     F --> K
     G --> K
     J --> K
-    
+
     K --> L[Console Log]
     K --> M[Voice Synthesis]
 ```
@@ -507,7 +529,9 @@ graph TD
 ### Command Processor Modules
 
 #### infoCommands.ts
+
 Handles informational and configuration commands:
+
 - `processHelpCommand()`: Display help information
 - `processStatusCommand()`: Show system status
 - `processClearCommand()`: Clear console
@@ -516,19 +540,25 @@ Handles informational and configuration commands:
 - `processQueryCommand()`: Data queries
 
 #### searchCommands.ts
+
 Handles research and search operations:
+
 - `processSearchCommand()`: Web search execution
 - Integrates with Research Agent
 - Simulates search results (mock data currently)
 
 #### workflowCommands.ts
+
 Handles workflow execution:
+
 - `processWorkflowCommand()`: Execute McP workflow
 - Monitor → Contextualize → Personalize phases
 - Feedback loop integration
 
 #### conversationCommands.ts
+
 Handles natural language processing:
+
 - `processTellMeAboutCommand()`: Topic information requests
 - `processConversationalQuery()`: General conversation
 - Intelligent response generation
@@ -540,12 +570,14 @@ Handles natural language processing:
 ### 1. Voice Interface
 
 **Speech Recognition**
+
 - Web Speech API integration
 - Browser compatibility detection
 - Real-time transcription
 - Microphone access management
 
 **Text-to-Speech Synthesis**
+
 - Voice response generation
 - Configurable voice settings
 - Selective response speaking
@@ -554,12 +586,14 @@ Handles natural language processing:
 ### 2. Multi-Agent Coordination
 
 **Agent Network**
+
 - 5 specialized agents with distinct roles
 - Dynamic agent status tracking
 - Message-based communication
 - Capability-based routing
 
 **Task Management**
+
 - Task creation with unique IDs
 - Status tracking (pending → processing → success/error)
 - Agent assignment based on capabilities
@@ -568,12 +602,14 @@ Handles natural language processing:
 ### 3. Command Processing
 
 **Intelligent Routing**
+
 - Pattern-based command recognition
 - Natural language understanding
 - Context-aware processing
 - Fallback handling
 
 **Modular Architecture**
+
 - Separate command processors
 - Easy to extend with new commands
 - Clean separation of concerns
@@ -582,11 +618,13 @@ Handles natural language processing:
 ### 4. McP Workflow System ✅ **FULLY IMPLEMENTED**
 
 **Real Three-Phase Architecture**
+
 1. **Monitor**: Actual data collection and trigger validation with confidence scoring
 2. **Contextualize**: Live semantic search and user pattern analysis using vector databases
 3. **Personalize**: LLM-powered adaptive response generation with personalization factors
 
 **Active Feedback Loop**
+
 - Continuous improvement through real workflow execution
 - User interaction tracking and pattern recognition
 - Adaptive learning with measurable confidence scores
@@ -594,12 +632,14 @@ Handles natural language processing:
 ### 5. Real-Time Monitoring ✅ **ENHANCED**
 
 **Live Performance Metrics**
+
 - Real workflow execution statistics (active/completed/failed)
 - Agent status updates during processing
 - Memory usage with dynamic thresholds
 - Response time tracking with phase-specific timing
 
 **Interactive Health Indicators**
+
 - Live workflow progress visualization
 - Real-time agent network status
 - Dynamic threshold-based warnings
@@ -608,6 +648,7 @@ Handles natural language processing:
 ### 6. Interactive Knowledge Visualization ✅ **FULLY IMPLEMENTED**
 
 **Dynamic Knowledge Graph**
+
 - Real-time agent relationship visualization
 - Interactive SVG-based graph with drag-and-drop
 - Live filtering and selection capabilities
@@ -617,6 +658,7 @@ Handles natural language processing:
 ### 7. Storage Management ✅ **INTEGRATED**
 
 **Multi-Storage Architecture**
+
 - DuckDB integration for structured data
 - ChromaDB integration for vector embeddings
 - SQLite for local data persistence
@@ -626,6 +668,7 @@ Handles natural language processing:
 ### 8. Comprehensive Testing ✅ **EXPANDED**
 
 **Advanced Feature Verification**
+
 - 14 automated system tests covering all features
 - Real MCP workflow validation with live execution
 - Component integrity checks with error simulation
@@ -646,6 +689,7 @@ Handles natural language processing:
 ```
 
 **Provides:**
+
 - Agent network state
 - Agent management functions
 - Task creation and tracking
@@ -653,6 +697,7 @@ Handles natural language processing:
 - Command processing
 
 **API:**
+
 - `sendAgentMessage(message)`: Send message between agents
 - `createAgentTask(task)`: Create new agent task
 - `updateAgentStatus(agentId, status)`: Update agent status
@@ -670,6 +715,7 @@ Handles natural language processing:
 **Purpose**: Manages command processing and console logging
 
 **State:**
+
 - `logs`: Array of console log entries
 - `feedbackEnabled`: Feedback loop toggle
 - `voiceEnabled`: Voice response toggle
@@ -677,6 +723,7 @@ Handles natural language processing:
 - `isSearching`: Search operation state
 
 **Functions:**
+
 - `addLog(type, message)`: Add entry to console
 - `handleCommand(commandText)`: Process user command
 
@@ -685,12 +732,14 @@ Handles natural language processing:
 **Purpose**: Web Speech API integration for voice input
 
 **Features:**
+
 - Browser compatibility detection
 - Microphone access management
 - Real-time transcription
 - Error handling
 
 **API:**
+
 - `isListening`: Current listening state
 - `transcript`: Current transcription
 - `startListening()`: Begin recognition
@@ -702,12 +751,14 @@ Handles natural language processing:
 **Purpose**: Text-to-speech synthesis for voice output
 
 **Features:**
+
 - Voice selection
 - Rate and pitch control
 - Queue management
 - Browser compatibility
 
 **API:**
+
 - `speakText(text)`: Speak given text
 - `stop()`: Cancel current speech
 - `voices`: Available voices
@@ -722,7 +773,7 @@ Handles natural language processing:
 type AgentStatus = "idle" | "processing" | "success" | "error";
 
 // Agent capabilities
-type AgentCapability = 
+type AgentCapability =
   | "conversation"
   | "search"
   | "workflow"
@@ -817,6 +868,7 @@ const { startListening } = useSpeechRecognition();
 **FeatureTester Component**
 
 Automated verification of:
+
 - ✅ Agent Network (5 agents active)
 - ✅ Command Processing (basic commands)
 - ✅ Speech Recognition (browser-dependent)
@@ -825,6 +877,7 @@ Automated verification of:
 - ✅ Agent Capabilities (all 5 agent types)
 
 **Test Results:**
+
 - All core features passing
 - Speech features browser-dependent
 - Mock data in use (requires real integration)
@@ -832,6 +885,7 @@ Automated verification of:
 ### Performance Monitoring
 
 **Metrics Tracked:**
+
 - **Memory Usage**: 45% (Warning: 70%, Critical: 85%)
 - **CPU Utilization**: 23%
 - **Response Time**: 120ms (Warning: 150ms, Critical: 200ms)
@@ -840,6 +894,7 @@ Automated verification of:
 - **Uptime**: Tracked since application start
 
 **Performance Thresholds:**
+
 - Memory: Warning at 70%, Critical at 85%
 - Response Time: Warning at 150ms, Critical at 200ms
 - Error Rate: Warning at 2%, Critical at 5%
@@ -869,6 +924,7 @@ Automated verification of:
 ### Test Coverage
 
 **Current Coverage:**
+
 - ✅ Unit tests for command processors
 - ✅ Integration tests for agent network
 - ✅ Performance benchmarking
@@ -984,9 +1040,9 @@ const initialAgents: Agent[] = [
 ```typescript
 const handleCommand = async (commandText: string) => {
   addLog("command", commandText);
-  
+
   const lowerCommand = commandText.toLowerCase();
-  
+
   if (lowerCommand === "help") {
     processHelpCommand(addLog);
   } else if (lowerCommand.startsWith("search")) {
@@ -1002,14 +1058,16 @@ const handleCommand = async (commandText: string) => {
 #### Agent Task Creation
 
 ```typescript
-const createAgentTask = (task: Omit<AgentTask, "id" | "timestamp" | "status">): AgentTask => {
+const createAgentTask = (
+  task: Omit<AgentTask, "id" | "timestamp" | "status">,
+): AgentTask => {
   const newTask: AgentTask = {
     ...task,
     id: uuidv4(),
     timestamp: new Date().toISOString(),
     status: "pending",
   };
-  
+
   updateAgentStatus(task.agentId, "processing");
   return newTask;
 };
@@ -1021,17 +1079,17 @@ const createAgentTask = (task: Omit<AgentTask, "id" | "timestamp" | "status">): 
 export const useSpeechRecognition = () => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
-  
+
   const recognition = new (window as any).webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.interimResults = true;
-  
+
   recognition.onresult = (event: any) => {
     const current = event.resultIndex;
     const transcriptText = event.results[current][0].transcript;
     setTranscript(transcriptText);
   };
-  
+
   // ... more implementation
 };
 ```
@@ -1041,30 +1099,36 @@ export const useSpeechRecognition = () => {
 ```typescript
 export const processWorkflowCommand = (
   addLog: (type: LogEntry["type"], message: string) => void,
-  feedbackEnabled: boolean
+  feedbackEnabled: boolean,
 ) => {
   addLog("system", "Initiating Monitor-Contextualize-Personalize workflow...");
-  
+
   // Monitor Phase
   setTimeout(() => {
     addLog("info", "📊 Monitor Phase: Collecting and observing data...");
   }, 500);
-  
+
   // Contextualize Phase
   setTimeout(() => {
-    addLog("info", "🧠 Contextualize Phase: Analyzing patterns and relationships...");
+    addLog(
+      "info",
+      "🧠 Contextualize Phase: Analyzing patterns and relationships...",
+    );
   }, 1500);
-  
+
   // Personalize Phase
   setTimeout(() => {
     addLog("info", "✨ Personalize Phase: Generating tailored response...");
   }, 2500);
-  
+
   // Completion
   setTimeout(() => {
     addLog("success", "✅ Workflow completed successfully!");
     if (feedbackEnabled) {
-      addLog("system", "🔄 Feedback loop active - system learning from results");
+      addLog(
+        "system",
+        "🔄 Feedback loop active - system learning from results",
+      );
     }
   }, 3500);
 };
@@ -1079,7 +1143,7 @@ const [metrics, setMetrics] = useState({
   responseTime: 0,
   activeConnections: 0,
   errorRate: 0,
-  uptime: 0
+  uptime: 0,
 });
 
 useEffect(() => {
@@ -1090,10 +1154,10 @@ useEffect(() => {
       responseTime: Math.random() * 300,
       activeConnections: Math.floor(Math.random() * 20),
       errorRate: Math.random() * 5,
-      uptime: (Date.now() - startTime) / 1000
+      uptime: (Date.now() - startTime) / 1000,
     });
   }, 2000);
-  
+
   return () => clearInterval(interval);
 }, []);
 ```
@@ -1113,7 +1177,7 @@ The project is currently **ready for development/demo** with a clear path to pro
 
 ---
 
-**Documentation Version**: 1.0  
-**Last Updated**: 2026-02-08  
-**Project Version**: v0.6.0-alpha  
+**Documentation Version**: 1.0
+**Last Updated**: 2026-02-13
+**Project Version**: v0.7.0-alpha
 **Maintainers**: Development Team
