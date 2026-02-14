@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,9 +8,12 @@ import { useAgentCommands } from "@/hooks/useAgentCommands";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useLocalAgentTruth } from "@/hooks/useLocalAgentTruth";
+import { useKnowledgeGraphDemo } from "@/hooks/useKnowledgeGraphDemo";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import { llmConfigManager } from "@/lib/llmConfig";
+import { storageConfigManager } from "@/lib/storageConfig";
 import { LocalStorageDatabase } from "@/lib/localStorage";
+import { createN8nAPI, getStoredN8nConfig, testN8nConnection } from "@/utils/n8n-api";
 
 type TestStatus = "pending" | "running" | "passed" | "failed" | "warning";
 
@@ -21,15 +24,27 @@ interface TestResult {
   timestamp?: string;
 }
 
+interface ControlAction {
+  group: string;
+  name: string;
+  run: () => Promise<TestResult>;
+}
+
 const FeatureTester = () => {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [actionResults, setActionResults] = useState<TestResult[]>([]);
   const [currentTest, setCurrentTest] = useState<string | null>(null);
+  const [currentAction, setCurrentAction] = useState<string | null>(null);
   const [overallStatus, setOverallStatus] = useState<TestStatus>("pending");
+  const [isRunningActions, setIsRunningActions] = useState(false);
   
   const agentNetwork = useAgentNetwork();
   const { handleCommand } = useAgentCommands();
   const { speechRecognitionSupported } = useSpeechRecognition(() => {});
   const { voiceSynthesisSupported } = useSpeechSynthesis();
+  const { simulateAgentInteraction, simulateSearchTask, resetAllAgents } = useKnowledgeGraphDemo();
+
+  const n8nAPI = useMemo(() => createN8nAPI(), []);
 
   const addTestResult = (test: TestResult) => {
     const newResult: TestResult = {
@@ -37,6 +52,14 @@ const FeatureTester = () => {
       timestamp: test.timestamp || new Date().toISOString()
     };
     setTestResults(prev => [...prev, newResult]);
+  };
+
+  const addActionResult = (result: TestResult) => {
+    const newResult: TestResult = {
+      ...result,
+      timestamp: result.timestamp || new Date().toISOString()
+    };
+    setActionResults(prev => [...prev, newResult]);
   };
 
   const runTest = async (testName: string, testFunction: () => Promise<TestResult>) => {
@@ -53,6 +76,334 @@ const FeatureTester = () => {
     }
     setCurrentTest(null);
   };
+
+  const runAction = async (action: ControlAction) => {
+    setCurrentAction(action.name);
+    try {
+      const result = await action.run();
+      addActionResult(result);
+    } catch (error) {
+      addActionResult({
+        name: action.name,
+        status: "failed",
+        message: `Action failed with error: ${error}`
+      });
+    }
+    setCurrentAction(null);
+  };
+
+  const createMockDataset = () => {
+    const stored = localStorage.getItem('adaptive-agent-training-datasets');
+    const datasets = stored ? JSON.parse(stored) : [];
+    const now = new Date().toISOString();
+    const newDataset = {
+      id: `dataset-${Date.now()}`,
+      name: `Demo Dataset ${datasets.length + 1}`,
+      type: 'conversational',
+      format: 'jsonl',
+      size: 2048,
+      sampleCount: 250,
+      created: now,
+      lastModified: now,
+      status: 'ready'
+    };
+    datasets.push(newDataset);
+    localStorage.setItem('adaptive-agent-training-datasets', JSON.stringify(datasets));
+    return newDataset;
+  };
+
+  const createMockTrainingJob = () => {
+    const storedDatasets = localStorage.getItem('adaptive-agent-training-datasets');
+    const datasets = storedDatasets ? JSON.parse(storedDatasets) : [];
+    const dataset = datasets.length > 0 ? datasets[datasets.length - 1] : createMockDataset();
+
+    const storedJobs = localStorage.getItem('adaptive-agent-training-jobs');
+    const jobs = storedJobs ? JSON.parse(storedJobs) : [];
+    const now = new Date().toISOString();
+    const newJob = {
+      id: `job-${Date.now()}`,
+      name: `${dataset.name} Training`,
+      baseModel: 'llama-3-8b-instruct',
+      dataset,
+      status: 'completed',
+      progress: 100,
+      currentEpoch: 3,
+      totalEpochs: 3,
+      loss: 0.42,
+      accuracy: 0.91,
+      created: now,
+      completed: now
+    };
+    jobs.push(newJob);
+    localStorage.setItem('adaptive-agent-training-jobs', JSON.stringify(jobs));
+    return newJob;
+  };
+
+  const controlActions: ControlAction[] = useMemo(() => [
+    {
+      group: 'n8n Workflows',
+      name: 'Test n8n Connection',
+      run: async () => {
+        const result = await testN8nConnection();
+        return {
+          name: 'Test n8n Connection',
+          status: result.success ? 'passed' : 'failed',
+          message: result.message
+        };
+      }
+    },
+    {
+      group: 'n8n Workflows',
+      name: 'Load Workflows',
+      run: async () => {
+        n8nAPI.updateConfig(getStoredN8nConfig());
+        const workflows = await n8nAPI.getWorkflows();
+        return {
+          name: 'Load Workflows',
+          status: 'passed',
+          message: `Loaded ${workflows.length} workflows from n8n.`
+        };
+      }
+    },
+    {
+      group: 'n8n Workflows',
+      name: 'Create McP Workflow',
+      run: async () => {
+        n8nAPI.updateConfig(getStoredN8nConfig());
+        const template = n8nAPI.createMcPWorkflowTemplate();
+        const created = await n8nAPI.createWorkflow(template);
+        return {
+          name: 'Create McP Workflow',
+          status: 'passed',
+          message: `Created workflow "${created.name}" (${created.id}).`
+        };
+      }
+    },
+    {
+      group: 'LLM Settings',
+      name: 'Set Mock LLM Config',
+      run: async () => {
+        llmConfigManager.saveConfig({
+          provider: 'mock',
+          model: 'mock-llm-v1',
+          temperature: 0.7,
+          maxTokens: 512
+        });
+        return {
+          name: 'Set Mock LLM Config',
+          status: 'passed',
+          message: 'Mock LLM configuration saved.'
+        };
+      }
+    },
+    {
+      group: 'LLM Settings',
+      name: 'Test LLM Connection',
+      run: async () => {
+        const result = await llmConfigManager.testConnection();
+        return {
+          name: 'Test LLM Connection',
+          status: result.success ? 'passed' : 'failed',
+          message: result.success ? 'LLM connection OK.' : result.error || 'LLM test failed.'
+        };
+      }
+    },
+    {
+      group: 'Storage',
+      name: 'Set Local Storage Config',
+      run: async () => {
+        storageConfigManager.saveConfig({
+          provider: 'localStorage',
+          enableEncryption: false,
+          maxStorageSize: 50
+        });
+        return {
+          name: 'Set Local Storage Config',
+          status: 'passed',
+          message: 'Storage config set to localStorage.'
+        };
+      }
+    },
+    {
+      group: 'Storage',
+      name: 'Test Storage Connection',
+      run: async () => {
+        const result = await storageConfigManager.testConnection();
+        return {
+          name: 'Test Storage Connection',
+          status: result.success ? 'passed' : 'failed',
+          message: result.success ? 'Storage connection OK.' : result.error || 'Storage test failed.'
+        };
+      }
+    },
+    {
+      group: 'Training',
+      name: 'Create Mock Dataset',
+      run: async () => {
+        const dataset = createMockDataset();
+        return {
+          name: 'Create Mock Dataset',
+          status: 'passed',
+          message: `Created dataset "${dataset.name}" with ${dataset.sampleCount} samples.`
+        };
+      }
+    },
+    {
+      group: 'Training',
+      name: 'Create Mock Training Job',
+      run: async () => {
+        const job = createMockTrainingJob();
+        return {
+          name: 'Create Mock Training Job',
+          status: 'passed',
+          message: `Created training job "${job.name}" (${job.status}).`
+        };
+      }
+    },
+    {
+      group: 'Training',
+      name: 'Trigger n8n Training Update',
+      run: async () => {
+        const storedJobs = localStorage.getItem('adaptive-agent-training-jobs');
+        const jobs = storedJobs ? JSON.parse(storedJobs) : [];
+        if (jobs.length === 0) {
+          return {
+            name: 'Trigger n8n Training Update',
+            status: 'warning',
+            message: 'No training jobs found. Create one first.'
+          };
+        }
+
+        const job = jobs[jobs.length - 1];
+        const trainingResult = {
+          modelName: job.baseModel,
+          accuracy: job.accuracy,
+          loss: job.loss,
+          epochs: job.totalEpochs,
+          trainingJobId: job.id
+        };
+
+        n8nAPI.updateConfig(getStoredN8nConfig());
+        await n8nAPI.triggerTrainingUpdate(job.id, trainingResult);
+        return {
+          name: 'Trigger n8n Training Update',
+          status: 'passed',
+          message: `Triggered workflow updates for training job ${job.id}.`
+        };
+      }
+    },
+    {
+      group: 'Agent Console',
+      name: 'Run Command: help',
+      run: async () => {
+        await handleCommand('help');
+        return {
+          name: 'Run Command: help',
+          status: 'passed',
+          message: 'Executed help command.'
+        };
+      }
+    },
+    {
+      group: 'Agent Console',
+      name: 'Run Command: workflow run',
+      run: async () => {
+        await handleCommand('workflow run');
+        return {
+          name: 'Run Command: workflow run',
+          status: 'passed',
+          message: 'Executed workflow run command.'
+        };
+      }
+    },
+    {
+      group: 'Agents',
+      name: 'Spawn Demo Agent',
+      run: async () => {
+        const spawned = await agentNetwork.spawnAgent({
+          name: `Demo Agent ${Date.now()}`,
+          specialization: 'testing',
+          capabilities: ['analysis', 'communication'],
+          initialTraining: 'Initial demo training data.'
+        });
+        return {
+          name: 'Spawn Demo Agent',
+          status: 'passed',
+          message: `Spawned agent "${spawned.name}" (${spawned.id}).`
+        };
+      }
+    },
+    {
+      group: 'MCP Workflow',
+      name: 'Run MCP Workflow',
+      run: async () => {
+        const trigger = {
+          id: `trigger-${Date.now()}`,
+          type: 'user_input',
+          source: 'control-center',
+          priority: 'normal',
+          data: {
+            message: 'Control center test trigger',
+            timestamp: new Date().toISOString(),
+            userId: 'control-center'
+          },
+          timestamp: new Date().toISOString()
+        };
+        const result = await agentNetwork.processMcpWorkflow(trigger);
+        return {
+          name: 'Run MCP Workflow',
+          status: result.success ? 'passed' : 'failed',
+          message: result.success ? `Completed phase: ${result.phase}.` : 'MCP workflow failed.'
+        };
+      }
+    },
+    {
+      group: 'Knowledge Graph',
+      name: 'Simulate Agent Interaction',
+      run: async () => {
+        simulateAgentInteraction();
+        return {
+          name: 'Simulate Agent Interaction',
+          status: 'passed',
+          message: 'Triggered agent interaction simulation.'
+        };
+      }
+    },
+    {
+      group: 'Knowledge Graph',
+      name: 'Simulate Search Task',
+      run: async () => {
+        simulateSearchTask();
+        return {
+          name: 'Simulate Search Task',
+          status: 'passed',
+          message: 'Triggered search task simulation.'
+        };
+      }
+    },
+    {
+      group: 'Knowledge Graph',
+      name: 'Reset Agent Status',
+      run: async () => {
+        resetAllAgents();
+        return {
+          name: 'Reset Agent Status',
+          status: 'passed',
+          message: 'Reset all agents to idle status.'
+        };
+      }
+    }
+  ], [agentNetwork, handleCommand, n8nAPI, resetAllAgents, simulateAgentInteraction, simulateSearchTask]);
+
+  const groupedActions = useMemo(() => {
+    return controlActions.reduce((acc, action) => {
+      if (!acc[action.group]) {
+        acc[action.group] = [];
+      }
+      acc[action.group].push(action);
+      return acc;
+    }, {} as Record<string, ControlAction[]>);
+  }, [controlActions]);
 
   const testAgentNetwork = async (): Promise<TestResult> => {
     return new Promise((resolve) => {
@@ -502,6 +853,19 @@ const FeatureTester = () => {
     }
   };
 
+  const runAllActions = async () => {
+    setIsRunningActions(true);
+    for (const action of controlActions) {
+      await runAction(action);
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    setIsRunningActions(false);
+  };
+
+  const clearActionResults = () => {
+    setActionResults([]);
+  };
+
   const getStatusColor = (status: TestStatus) => {
     switch (status) {
       case "passed": return "text-green-400";
@@ -524,6 +888,89 @@ const FeatureTester = () => {
 
   return (
     <div className="space-y-6">
+      <Card className="bg-slate-800/50 border-slate-700">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>System Control Center</span>
+            <div className="flex items-center space-x-2">
+              <Button onClick={runAllActions} disabled={isRunningActions}>
+                {isRunningActions ? "Running Actions..." : "Run All Actions"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={clearActionResults}
+                disabled={actionResults.length === 0}
+              >
+                Clear Log
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4 text-sm text-slate-400">
+            Execute key actions across n8n workflows, LLM settings, storage, training, agent console, MCP, and knowledge graph.
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {Object.entries(groupedActions).map(([group, actions]) => (
+              <div key={group} className="rounded-md border border-slate-700 bg-slate-900/40 p-3">
+                <div className="text-sm font-semibold text-slate-200 mb-2">{group}</div>
+                <div className="grid gap-2">
+                  {actions.map((action) => (
+                    <Button
+                      key={action.name}
+                      variant="outline"
+                      onClick={() => runAction(action)}
+                      disabled={isRunningActions || currentAction === action.name}
+                      className="justify-start"
+                    >
+                      {action.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {actionResults.length === 0 ? (
+              <div className="text-center py-6 text-slate-400">
+                <div className="mb-4">
+                  <CheckCircle className="h-10 w-10 mx-auto opacity-50" />
+                </div>
+                <p className="text-base font-medium mb-2">Control center ready</p>
+                <p>Run any action to validate behavior and capture outputs.</p>
+              </div>
+            ) : (
+              actionResults.map((result, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-slate-900/50 rounded-md">
+                  <div className="flex items-center space-x-3">
+                    <span className={getStatusColor(result.status)}>
+                      {getStatusIcon(result.status)}
+                    </span>
+                    <span className="font-medium">{result.name}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-slate-300">{result.message}</div>
+                    <div className="text-xs text-slate-500">
+                      {new Date(result.timestamp || "").toLocaleTimeString()}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {currentAction && (
+            <div className="mt-4 p-3 bg-blue-900/20 border border-blue-600 rounded-md">
+              <div className="flex items-center space-x-2 text-blue-400">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Running action: {currentAction}</span>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <Card className="bg-slate-800/50 border-slate-700">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">

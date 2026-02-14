@@ -4,14 +4,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 
-import StoragePanel from "@/components/StoragePanel";
 import KnowledgeGraph from "@/components/KnowledgeGraph";
 import AgentConsole from "@/components/AgentConsole";
 import Header from "@/components/Header";
 import DashboardTab from "@/components/dashboard/DashboardTab";
 import WorkflowsTab from "@/components/dashboard/WorkflowsTab";
 import FeatureTester from "@/test/FeatureTester";
-import { LLMSettings } from "@/components/LLMSettings";
 import { LocalTrainingStudio } from "@/components/LocalTrainingStudio";
 import { useAgentNetwork } from "@/contexts/AgentNetworkContext";
 import { McpWorkflowTrigger } from "@/types/agent";
@@ -123,13 +121,11 @@ const Index = () => {
 
       <div className="container mx-auto py-6 px-4 md:px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-1 md:gap-2 bg-slate-800/50 h-auto">
+          <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1 md:gap-2 bg-slate-800/50 h-auto">
             <TabsTrigger value="dashboard" className="text-xs md:text-sm">Dashboard</TabsTrigger>
             <TabsTrigger value="workflows" className="text-xs md:text-sm">n8n Workflows</TabsTrigger>
-            <TabsTrigger value="storage" className="text-xs md:text-sm">Storage</TabsTrigger>
             <TabsTrigger value="knowledge" className="text-xs md:text-sm">Knowledge Graph</TabsTrigger>
             <TabsTrigger value="console" className="text-xs md:text-sm">Agent Console</TabsTrigger>
-            <TabsTrigger value="llm" className="text-xs md:text-sm">LLM Settings</TabsTrigger>
             <TabsTrigger value="training" className="text-xs md:text-sm">Local Training</TabsTrigger>
             <TabsTrigger value="testing" className="text-xs md:text-sm">System Tests</TabsTrigger>
           </TabsList>
@@ -147,20 +143,12 @@ const Index = () => {
             <WorkflowsTab />
           </TabsContent>
 
-          <TabsContent value="storage">
-            <StoragePanel />
-          </TabsContent>
-
           <TabsContent value="knowledge">
             <KnowledgeGraph />
           </TabsContent>
 
           <TabsContent value="console">
             <AgentConsole />
-          </TabsContent>
-
-          <TabsContent value="llm">
-            <LLMSettings />
           </TabsContent>
 
           <TabsContent value="training">

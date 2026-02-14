@@ -51,6 +51,10 @@ export class N8nAPI {
     this.config = config;
   }
 
+  updateConfig(config: N8nConfig): void {
+    this.config = config;
+  }
+
   /**
    * Test connection to n8n instance
    */

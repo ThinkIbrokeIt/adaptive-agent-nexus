@@ -4,20 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig((env: ConfigEnv) => {
-  const isDev = env.mode === 'development';
   const plugins: Array<ReturnType<typeof react>> = [react()];
-
-  // Only add componentTagger in development mode
-  if (isDev) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-require-imports
-      const componentTagger = require("lovable-tagger");
-      plugins.push(componentTagger());
-    } catch (error) {
-      // Silently ignore if lovable-tagger is not available
-      console.warn('lovable-tagger not available, skipping component tagging');
-    }
-  }
 
   const config: UserConfig = {
     base: env.mode === 'production' ? '/adaptive-agent-nexus/' : '/',

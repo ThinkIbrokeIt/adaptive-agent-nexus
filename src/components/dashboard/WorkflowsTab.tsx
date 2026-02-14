@@ -12,8 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, RefreshCw, Save, Play, Settings, Eye, Edit, Plus, History, Copy, Download, Upload, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { N8nAPI, N8nWorkflow, N8nConfig, N8nWorkflowVersion, BulkWorkflowOperation, TrainingWorkflowIntegration, getStoredN8nConfig, storeN8nConfig, createN8nAPI, testN8nConnection } from "@/utils/n8n-api";
-import WorkflowBootstrap from "@/components/WorkflowBootstrap";
+import { N8nAPI, N8nWorkflow, N8nConfig, N8nWorkflowVersion, BulkWorkflowOperation, TrainingWorkflowIntegration, getStoredN8nConfig, createN8nAPI } from "@/utils/n8n-api";
 
 const WorkflowsTab = () => {
   const { toast } = useToast();
@@ -26,6 +25,13 @@ const WorkflowsTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [workflowJson, setWorkflowJson] = useState('');
   const [n8nAPI] = useState(() => createN8nAPI());
+
+  const syncConfig = () => {
+    const stored = getStoredN8nConfig();
+    setConfig(stored);
+    n8nAPI.updateConfig(stored);
+    return stored;
+  };
 
   // Versioning state
   const [workflowVersions, setWorkflowVersions] = useState<N8nWorkflowVersion[]>([]);
@@ -44,10 +50,11 @@ const WorkflowsTab = () => {
   });
 
   useEffect(() => {
-    if (config.apiKey) {
+    const stored = syncConfig();
+    if (stored.apiKey) {
       loadWorkflows();
     }
-  }, [config]);
+  }, []);
 
   useEffect(() => {
     if (selectedWorkflow) {
@@ -59,16 +66,10 @@ const WorkflowsTab = () => {
     loadTrainingIntegrations();
   }, []);
 
-  useEffect(() => {
-    if (config.apiKey) {
-      loadWorkflows();
-    }
-  }, [config]);
-
   const loadWorkflows = async () => {
     setIsLoading(true);
     try {
-      n8nAPI.updateConfig(config);
+      syncConfig();
       const data = await n8nAPI.getWorkflows();
       setWorkflows(data);
       toast({
@@ -91,7 +92,7 @@ const WorkflowsTab = () => {
 
     setIsSaving(true);
     try {
-      n8nAPI.updateConfig(config);
+      syncConfig();
       const workflowData = JSON.parse(workflowJson);
       const updatedWorkflow = await n8nAPI.updateWorkflow(selectedWorkflow.id, {
         ...selectedWorkflow,
@@ -123,7 +124,7 @@ const WorkflowsTab = () => {
 
     setIsTesting(true);
     try {
-      n8nAPI.updateConfig(config);
+      syncConfig();
       await n8nAPI.testWorkflow(selectedWorkflow.id);
 
       toast({
@@ -160,7 +161,7 @@ const WorkflowsTab = () => {
     };
 
     try {
-      n8nAPI.updateConfig(config);
+      syncConfig();
       const createdWorkflow = await n8nAPI.createWorkflow(newWorkflow);
       setWorkflows([...workflows, createdWorkflow]);
       setSelectedWorkflow(createdWorkflow);
@@ -177,39 +178,6 @@ const WorkflowsTab = () => {
         description: error instanceof Error ? error.message : 'Unknown error occurred',
         variant: "destructive",
       });
-    }
-  };
-
-  const updateConfig = (field: keyof N8nConfig, value: string) => {
-    const newConfig = { ...config, [field]: value };
-    setConfig(newConfig);
-    storeN8nConfig(newConfig);
-  };
-
-  const testConnection = async () => {
-    setIsLoading(true);
-    try {
-      const result = await testN8nConnection();
-      if (result.success) {
-        toast({
-          title: "Connection Successful",
-          description: result.message + (result.version ? ` (n8n ${result.version})` : ''),
-        });
-      } else {
-        toast({
-          title: "Connection Failed",
-          description: result.message,
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Connection Test Error",
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -362,103 +330,61 @@ const WorkflowsTab = () => {
     });
   };
 
+  const refreshSettings = async () => {
+    const stored = syncConfig();
+    if (!stored.apiKey) {
+      toast({
+        title: "Settings Refreshed",
+        description: "No n8n API key found in Settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await loadWorkflows();
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Settings className="h-6 w-6 text-blue-500" />
-        <h2 className="text-2xl font-bold">n8n Workflow Management</h2>
-        <Badge variant="secondary">Production Ready</Badge>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Settings className="h-6 w-6 text-blue-500" />
+          <h2 className="text-2xl font-bold">n8n Workflow Management</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">Production Ready</Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshSettings}
+            disabled={isLoading}
+            className="flex items-center gap-2"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            Refresh Settings
+          </Button>
+        </div>
       </div>
 
       <Alert>
         <Settings className="h-4 w-4" />
         <AlertDescription>
-          Configure and manage n8n workflows for your adaptive agent system. Workflows handle McP processing, data routing, and agent coordination.
+          Configure and manage n8n workflows for your adaptive agent system. Initial connection setup now lives in Settings.
         </AlertDescription>
       </Alert>
 
-      <WorkflowBootstrap />
-
-      <Tabs defaultValue="config" className="space-y-4">
+      <Tabs defaultValue="workflows" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="config">Configuration</TabsTrigger>
           <TabsTrigger value="workflows">Workflows</TabsTrigger>
           <TabsTrigger value="editor">Editor</TabsTrigger>
           <TabsTrigger value="versions">Versions</TabsTrigger>
           <TabsTrigger value="bulk">Bulk Operations</TabsTrigger>
           <TabsTrigger value="training">Training Integration</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="config" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>n8n Connection Settings</CardTitle>
-              <CardDescription>
-                Configure your n8n instance connection for workflow management
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="baseUrl">n8n Base URL</Label>
-                  <Input
-                    id="baseUrl"
-                    value={config.baseUrl}
-                    onChange={(e) => updateConfig('baseUrl', e.target.value)}
-                    placeholder="http://localhost:5678"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="apiKey">API Key</Label>
-                  <Input
-                    id="apiKey"
-                    type="password"
-                    value={config.apiKey}
-                    onChange={(e) => updateConfig('apiKey', e.target.value)}
-                    placeholder="Enter your n8n API key"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={testConnection}
-                  disabled={!config.baseUrl || isLoading}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Testing...
-                    </>
-                  ) : (
-                    <>
-                      <Settings className="h-4 w-4 mr-2" />
-                      Test Connection
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={loadWorkflows}
-                  disabled={!config.apiKey || isLoading}
-                  className="flex-1"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Loading Workflows...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Load Workflows
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="workflows" className="space-y-4">
           <div className="flex justify-between items-center">

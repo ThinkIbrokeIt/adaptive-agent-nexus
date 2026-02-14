@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Shield } from "lucide-react";
+import { Settings, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
@@ -34,6 +34,15 @@ const Header = ({ systemLoad, processingStage, runMcpWorkflow }: HeaderProps) =>
             >
               <Shield className="h-4 w-4" />
               Truth Files
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => navigate("/settings")}
+              className="gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Settings
             </Button>
             <Button size="sm" variant="outline" onClick={runMcpWorkflow} disabled={!!processingStage}>
               {processingStage ? `Processing: ${processingStage}` : "Run McP Workflow"}

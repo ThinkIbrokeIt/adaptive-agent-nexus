@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AgentNetworkProvider } from "@/contexts/AgentNetworkContext";
 import Index from "./pages/Index";
 import AgentTruths from "./pages/AgentTruths";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 // Create a client
@@ -33,6 +34,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/truths" element={<AgentTruths />} />
+              <Route path="/settings" element={<Settings />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
