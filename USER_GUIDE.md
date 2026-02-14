@@ -16,7 +16,8 @@ Adaptive Agent Nexus is an intelligent multi-agent AI system that learns from in
 6. [Commands & Features](#commands--features)
 7. [Troubleshooting](#troubleshooting)
 8. [FAQ](#faq)
-9. [Support](#support)
+9. [Managing GitHub App Access](#managing-github-app-access)
+10. [Support](#support)
 
 ---
 
@@ -366,6 +367,109 @@ A: Yes, use the Agent Truth Files section to create and modify agent personaliti
 
 **Q: How does the learning system work?**
 A: The feedback loop analyzes interaction effectiveness and automatically adjusts agent responses and knowledge representation over time.
+
+### Repository & GitHub Questions
+
+**Q: How do I remove apps that I've allowed to connect to this repository?**
+A: See the [Managing GitHub App Access](#managing-github-app-access) section for detailed instructions on removing GitHub Apps and OAuth Apps from your repository, personal account, or organization.
+
+**Q: How do I check what apps have access to my repository?**
+A: Go to your repository Settings → Integrations → GitHub Apps (for repository-level apps) or your personal Settings → Applications (for account-level OAuth apps).
+
+---
+
+## Managing GitHub App Access
+
+### How to Remove Apps Connected to Your Repository
+
+If you've authorized GitHub Apps or OAuth Apps to access this repository and want to remove them, follow these steps:
+
+#### Removing GitHub Apps from a Repository
+
+1. **Navigate to Repository Settings**
+   - Go to your repository on GitHub: `https://github.com/your-username/your-repository`
+   - Click on **Settings** tab (requires repository admin access)
+
+2. **Access Installed Apps**
+   - In the left sidebar, scroll down to **Integrations** section
+   - Click on **GitHub Apps**
+
+3. **Review and Remove Apps**
+   - You'll see a list of all GitHub Apps installed on this repository
+   - Click **Configure** next to the app you want to remove
+   - Scroll down and click **Uninstall** or **Remove**
+   - Confirm the removal when prompted
+
+#### Removing OAuth Apps from Your Personal Account
+
+If the app is an OAuth App connected to your personal account:
+
+1. **Go to Personal Settings**
+   - Click your profile picture in the top-right corner
+   - Select **Settings**
+
+2. **Access Applications**
+   - In the left sidebar, click **Applications**
+   - Select **Authorized OAuth Apps** tab
+
+3. **Revoke Access**
+   - Find the app you want to remove
+   - Click on the app name
+   - Click **Revoke** button
+   - Confirm the revocation
+
+#### Removing Apps at Organization Level
+
+For organizations:
+
+1. **Navigate to Organization Settings**
+   - Go to your organization page
+   - Click **Settings** (requires org owner permissions)
+
+2. **Manage GitHub Apps**
+   - Click **GitHub Apps** in the left sidebar under **Third-party access**
+   - Click **Configure** next to the app
+   - Click **Uninstall** at the bottom of the page
+
+3. **Review OAuth App Access**
+   - Click **OAuth application policy** in the left sidebar
+   - Review and revoke access as needed
+
+### Checking Current App Permissions
+
+To see what permissions an app currently has:
+
+1. Go to the app's configuration page (steps above)
+2. Review the **Permissions** section
+3. Check **Repository access** to see which repos the app can access
+
+### Troubleshooting App Removal
+
+**Problem**: Can't see Settings tab on repository
+
+**Solution**: You need admin access to the repository. Contact the repository owner if you don't have access.
+
+**Problem**: App still has access after removal
+
+**Solution**: 
+- Clear your browser cache
+- Log out and log back into GitHub
+- Check if the app was installed at organization level (requires separate removal)
+
+**Problem**: Not sure which apps are connected
+
+**Solution**:
+- Check **Settings** → **Integrations** → **GitHub Apps** for repository-level apps
+- Check your personal **Settings** → **Applications** for account-level OAuth apps
+- Check organization settings if the repo is under an organization
+
+### Security Best Practices
+
+- **Review regularly**: Audit connected apps every few months
+- **Principle of least privilege**: Only grant apps the minimum permissions they need
+- **Remove unused apps**: Uninstall apps you're no longer using
+- **Check permissions**: Review what data each app can access before installing
+- **Use organization policies**: Set up OAuth app restrictions at the org level
 
 ---
 
