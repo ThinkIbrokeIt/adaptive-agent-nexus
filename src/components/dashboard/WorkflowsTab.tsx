@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, RefreshCw, Save, Play, Settings, Eye, Edit, Plus, History, Copy, Download, Upload, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { N8nAPI, N8nWorkflow, N8nConfig, N8nWorkflowVersion, BulkWorkflowOperation, TrainingWorkflowIntegration, getStoredN8nConfig, storeN8nConfig, createN8nAPI, testN8nConnection } from "@/utils/n8n-api";
+import WorkflowBootstrap from "@/components/WorkflowBootstrap";
 
 const WorkflowsTab = () => {
   const { toast } = useToast();
@@ -375,6 +376,8 @@ const WorkflowsTab = () => {
           Configure and manage n8n workflows for your adaptive agent system. Workflows handle McP processing, data routing, and agent coordination.
         </AlertDescription>
       </Alert>
+
+      <WorkflowBootstrap />
 
       <Tabs defaultValue="config" className="space-y-4">
         <TabsList>
