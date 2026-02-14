@@ -387,7 +387,7 @@ If you've authorized GitHub Apps or OAuth Apps to access this repository and wan
 #### Removing GitHub Apps from a Repository
 
 1. **Navigate to Repository Settings**
-   - Go to your repository on GitHub: `https://github.com/your-username/adaptive-agent-nexus`
+   - Go to your repository on GitHub: `https://github.com/your-username/your-repository`
    - Click on **Settings** tab (requires repository admin access)
 
 2. **Access Installed Apps**
